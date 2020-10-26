@@ -1,3 +1,4 @@
+import { Arithmetic } from './../Expresiones/Arithmetic';
 import { Return } from './Return';
 import { Exceptionn } from '../utilidad/Exceptionn';
 
@@ -16,9 +17,19 @@ export class Case extends Node{
       if(this.SoloExpresion){
         if(this.expression!==null){
         tree.codigo3d.push("//********Condicion case*******")
-      let expresion=this.expression.codigo3direcciones(tabla,tree);
-      this.etiquetaV=tree.getEtiqueta();
-      tree.codigo3d.push(`if(${this.temporal}==${expresion})goto L${this.etiquetaV};`);
+        let comparacion=new Arithmetic(this.temporal,this.expression,"==",this.line,this.column);
+// comparacion es 1 o 0
+
+      let expresion=comparacion.codigo3direcciones(tabla,tree);
+     // console.log(expresion)
+     this.etiquetaV=tree.getEtiqueta();
+     //tree.codigo3d.push(`t0=${this.temporal};`);
+     // tree.codigo3d.push(`${expresion};`);
+      //tree.codigo3d.push(`compararString();`);
+      //tree.codigo3d.push(`******${expresion}****`);
+     // tree.codigo3d.push("//********terminar*******")
+    tree.codigo3d.push(`if(1==${expresion})goto L${this.etiquetaV};`);
+     // tree.codigo3d.push(`if(${this.temporal}==${expresion})goto L${this.etiquetaV};`);
     return false;
       }else{return true;}
       }
@@ -69,7 +80,7 @@ for (let x = 0; x <  this.ListaInstrucciones.length; x++) {
     expression : Node;
     ListaInstrucciones:Array<Node>;
     bandera:boolean;
-    temporal:string;
+    temporal:Node;
     etiqueta:string;
     SoloExpresion:boolean;
     etiquetaV:number;
@@ -80,7 +91,7 @@ for (let x = 0; x <  this.ListaInstrucciones.length; x++) {
         this.expression = expression;
         this.ListaInstrucciones=ListaInstrucciones;
         this.SoloExpresion=this.bandera = false;
-        this.etiqueta=this.temporal="";
+        this.etiqueta=null;
         this.etiquetaV=-1;
 
 

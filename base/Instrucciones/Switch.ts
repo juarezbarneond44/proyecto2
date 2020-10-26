@@ -18,7 +18,7 @@ export class Switch extends Node{
   codigo3direcciones(tabla: Tabla, tree: Tree) {
     tree.pila.push(new Type (types.SWITCH));
     tree.codigo3d.push("//********Switch*******")
-    let expresion=this.expression.codigo3direcciones(tabla,tree);
+    //let expresion=this.expression.codigo3direcciones(tabla,tree);
     let nueva=new Tabla(tabla)
     let etiqueta=tree.getEtiqueta();
     let dato:any=false;
@@ -26,7 +26,7 @@ export class Switch extends Node{
       if(element instanceof Case)
       {
         element.SoloExpresion=true;
-        element.temporal=expresion;
+        element.temporal=this.expression;
         element.etiqueta="L"+etiqueta;
       }
       dato= element.codigo3direcciones(nueva,tree);
@@ -42,7 +42,7 @@ export class Switch extends Node{
       if(element instanceof Case)
       {
         element.SoloExpresion=false;
-        element.temporal=expresion;
+        element.temporal=this.expression;
         element.etiqueta="L"+etiqueta;
       }
       element.codigo3direcciones(nueva,tree);

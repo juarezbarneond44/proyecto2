@@ -39,80 +39,50 @@ export class Arithmetic extends Node {
             tree.codigo3d.push("t0="+izquierdo+";");  //cargamos lavieja cadena
             tree.codigo3d.push("concatenarString();"); //realizamos la accion
           }
-          else if(this.leftOperator.type.type==types.NUMERIC||this.leftOperator.type.type==types.BOOLEAN)
+          else if(this.leftOperator.type.type==types.NUMERIC)
           {
-          if(this.leftOperator instanceof Primitive)
-            {
-
-              let aux:string=izquierdo+"";
-              tree.codigo3d.push("t"+contador1+"=p;");
-              for (const iterator of aux)
-              {
-                tree.codigo3d.push("//agregamos el numero o boolean al heap");
-                tree.codigo3d.push("t0=p;");
-                tree.codigo3d.push("t1="+iterator.charCodeAt(0)+";");
-                tree.codigo3d.push("guardarString();");
-              }
-
-            } else // aqui debe de estar el temporal
-            {
             tree.codigo3d.push("t"+contador1+"=p;"); // guardara el inicio de la cadena
-             tree.codigo3d.push("t0=p;");
-             if(this.leftOperator.type.type==types.BOOLEAN){tree.codigo3d.push("t1=-3;");}
-             else{tree.codigo3d.push("t1=-2;");}
-             tree.codigo3d.push("guardarString();");
-             tree.codigo3d.push("t0=p;");
-             if(this.leftOperator.type.type==types.BOOLEAN){   tree.codigo3d.push("t1="+izquierdo+";");}
-             else{tree.codigo3d.push("t1="+izquierdo+";");}
-             tree.codigo3d.push("guardarString();");
-            }
+            tree.codigo3d.push("t2="+izquierdo+";");
+            tree.codigo3d.push("NumberToString();");
+
+            //tree.codigo3d.push("guardarString();");
+            // tree.codigo3d.push("t0=p;");
+          //   if(this.leftOperator.type.type==types.BOOLEAN){   tree.codigo3d.push("t1="+izquierdo+";");}
+           //  else{tree.codigo3d.push("t1="+izquierdo+";");}
+           //  tree.codigo3d.push("guardarString();");
+          }
+          else if (this.leftOperator.type.type==types.BOOLEAN)
+          {
+            //hacer uno pa booleanos :,v
+
+            tree.codigo3d.push("t"+contador1+"=p;"); // guardara el inicio de la cadena
+            tree.codigo3d.push("t2="+izquierdo+";");  //cargamos lavieja cadena
+            tree.codigo3d.push("BooleanToString();"); //realizamos la accion
+
+
           }
           // la derecha
           if(this.rightOperator.type.type==types.STRING)
           {
-            //let contador1=tree.getContador();
-           // tree.codigo3d.push("t"+contador1+"=p;"); // guardara el inicio de la cadena
             tree.codigo3d.push("t0="+derecho+";");  //cargamos lavieja cadena
             tree.codigo3d.push("concatenarString();"); //realizamos la accion
+
           }
-          else if(this.rightOperator.type.type==types.NUMERIC||this.rightOperator.type.type==types.BOOLEAN)
+          else if(this.rightOperator.type.type==types.NUMERIC)
           {
-            if(this.rightOperator instanceof Primitive)
-            {
 
-              let aux:string=derecho+"";
-              for (const iterator of aux)
-              {
-                tree.codigo3d.push("//agregamos el string al heap");
-                tree.codigo3d.push("t0=p;");
+            tree.codigo3d.push("t2="+derecho+";");
+            tree.codigo3d.push("NumberToString();");
 
-                tree.codigo3d.push("t1="+iterator.charCodeAt(0)+";");
-                tree.codigo3d.push("guardarString();");
-              }
-              tree.codigo3d.push("t0=p;");
-              tree.codigo3d.push("t1=-1;");
-              tree.codigo3d.push("guardarString();");
-             }
-             else // aqui debe de estar el temporal
-             {
-              tree.codigo3d.push("t0=p;");
-              if(this.rightOperator.type.type==types.BOOLEAN){tree.codigo3d.push("t1=-3;");}
-              else{tree.codigo3d.push("t1=-2;");}
-
-              tree.codigo3d.push("guardarString();");
-              tree.codigo3d.push("t0=p;");
-              if(this.rightOperator.type.type==types.BOOLEAN){   tree.codigo3d.push("t1="+derecho+";");}
-              else{tree.codigo3d.push("t1="+derecho+";");}
-              tree.codigo3d.push("guardarString();");
-             }
           }
-
-
-        tree.codigo3d.push("t0=p;");
-        tree.codigo3d.push("t1=-1;");
-        tree.codigo3d.push("guardarString();");
-
-
+          else if (this.rightOperator.type.type==types.BOOLEAN)
+          {
+            tree.codigo3d.push("t2="+derecho+";");  //cargamos lavieja cadena
+            tree.codigo3d.push("BooleanToString();"); //realizamos la accion
+          }
+          tree.codigo3d.push("t0=p;");
+          tree.codigo3d.push("t1=-1;");
+       tree.codigo3d.push("guardarString();");
         return "t"+contador1;
       }
       else{
@@ -298,9 +268,21 @@ export class Arithmetic extends Node {
       &&(this.rightOperator.type.type===types.BOOLEAN||this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.STRING))
       {
 
+          // aqui va a ir el string
+
        let valor;
        tree.codigo3d.push(`//comparar ==`);
-       tree.codigo3d.push(`if(${izquierdo}==${derecho})goto L${tree.getEtiqueta()};`);
+       if(this.leftOperator.type.type===types.STRING&&this.rightOperator.type.type===types.STRING)
+       {
+        tree.codigo3d.push(`t0=${izquierdo};`);
+        tree.codigo3d.push(`t1=${derecho};`);
+        tree.codigo3d.push(`compararString();`);
+        tree.codigo3d.push(`if(1==t4)goto L${tree.getEtiqueta()};`);
+       }
+       else
+       {
+        tree.codigo3d.push(`if(${izquierdo}==${derecho})goto L${tree.getEtiqueta()};`);
+       }
        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
        tree.codigo3d.push(`t${tree.getContador()}=1;`);

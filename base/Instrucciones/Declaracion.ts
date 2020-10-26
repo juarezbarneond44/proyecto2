@@ -15,7 +15,7 @@ export class Declaracion extends Node {
 
 if(this.value!==null)
 {
-  let dato=this.value.codigo3direcciones(tabla,tree);
+  let dato=this.value.codigo3direcciones(tabla,tree);//
   let simbol = new Simbol(this.TipoInicial,this.value.type, this.identifier, null);
   let stack=tree.getSTACK();
   let contador=tree.getContador(); //temporales

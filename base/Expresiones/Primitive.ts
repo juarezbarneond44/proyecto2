@@ -40,7 +40,7 @@ export class Primitive extends Node{
       }
 
       else if(this.type.type===types.BOOLEAN){
-        if(this.value==="true"||this.value){return 1}
+        if(this.value==="true"||this.value){ return 1;}
         else {return 0;}
 
        }

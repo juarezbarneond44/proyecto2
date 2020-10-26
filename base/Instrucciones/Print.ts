@@ -19,7 +19,7 @@ export class Print extends Node{
     if(this.expression!==null){
 
       if(this.expression.length===1)
-      {
+      {  tree.codigo3d.push("//***print****")
 
         data=this.expression[0].codigo3direcciones(tabla,tree);
         if(this.expression[0].type===null){return null}
@@ -77,8 +77,24 @@ export class Print extends Node{
        }
        else if(this.expression[0].type.type==types.BOOLEAN)
        {
-
-       tree.codigo3d.push("printf(\"%d\",(int)"+data+");");
+        let etiquetaV=tree.getEtiqueta();
+        let etiquetaF=tree.getEtiqueta();
+        let etiquetaS=tree.getEtiqueta();
+       tree.codigo3d.push(`if(${data}==1) goto L${etiquetaV};`);
+       tree.codigo3d.push(`goto L${etiquetaF};`);
+       tree.codigo3d.push(`L${etiquetaV}:`);
+       tree.codigo3d.push("printf(\"%c\",116);");
+       tree.codigo3d.push("printf(\"%c\",114);");
+       tree.codigo3d.push("printf(\"%c\",117);");
+       tree.codigo3d.push("printf(\"%c\",101);");
+       tree.codigo3d.push(`goto L${etiquetaS};`);
+       tree.codigo3d.push(`L${etiquetaF}:`);
+       tree.codigo3d.push("printf(\"%c\",102);");
+       tree.codigo3d.push("printf(\"%c\",97);");
+       tree.codigo3d.push("printf(\"%c\",108);");
+       tree.codigo3d.push("printf(\"%c\",115);");
+       tree.codigo3d.push("printf(\"%c\",101);");
+       tree.codigo3d.push(`L${etiquetaS}:`);
        tree.codigo3d.push("printf(\"%c\",10);");
        }else
        {
