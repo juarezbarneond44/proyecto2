@@ -1,0 +1,43 @@
+<div class="jumbotron">
+  <h1 class="display-4">COMPILADOR JUANITO 2.0</h1>
+</div>
+<div class="row">
+  <div class="col-md-4"><button type="button" class="btn btn-info btn-block btn-lg"(click)="graficarEntornos()">Tabla De Símbolos</button></div>
+  <div class="col-md-4"><button type="button" class="btn btn-info btn-block btn-lg"(click)="generarAST()">Graficar AST</button></div>
+  <div class="col-md-4"><button type="button" class="btn btn-info btn-block btn-lg" (click)="generarPDF()">Reporte De Errores</button></div>
+</div> <br>
+
+  <div class="card-group">
+  <div class="card">
+      <li  class="list-group-item list-group-item-primary text-center"  >Codigo De Entrada</li>
+
+    <div class="card-body  p-3 mb-2 bg-secondary ">
+      <ngx-codemirror id="codemirrorCode"#codemirror [options]="codeMirrorOptions"  [(ngModel)]="textoEntrada" > </ngx-codemirror>
+
+    </div>
+    <button type="button" class="btn  btn-outline-danger btn-lg" id="limpiarEntrada" (click)="limpiarEntrada()">Limpiar</button>
+  </div>
+  <div class="card">
+      <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-success btn-lg" id="botonEjecutar" (click)="ejecutar()" >Ejecutar</button>
+          <button type="button" class="btn btn-warning btn-lg" id="botonTraducir"(click)="traducir()">Traducir</button>
+      </div>
+   <div class="card-body  p-3 mb-2 bg-secondary btn-lg">
+    <ngx-codemirror id="codemirrorCode2"#codemirror2 [options]="codeMirrorOptions2" [(ngModel)]="textoSalida" > </ngx-codemirror>
+    </div>
+
+    <div class="btn-group" role="group" aria-label="Basic example">
+      <button type="button" class="btn btn-outline-danger btn-lg" id="limpiarSalida"  (click)="limpiarSalida()">Limpiar</button>
+      <button type="button" class="btn btn-outline-secondary btn-lg"  (click)="copyInputMessage()" id="copiarSalida">Copiar</button>
+  </div>
+  </div>
+  </div>
+
+  <div class="card-group p-20 " role="group" id="ast">
+    <div _ngcontent-srk-c16="" class="card bg-transparent">
+        <svg id="todoTree"></svg>
+    </div>
+</div>
+
+
+<router-outlet></router-outlet>
