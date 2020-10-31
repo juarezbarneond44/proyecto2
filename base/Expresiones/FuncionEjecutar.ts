@@ -1,3 +1,5 @@
+import { Primitive } from './Primitive';
+import { Arithmetic } from './Arithmetic';
 import { Identificador } from './Identificador';
 import { ArregloValor } from './ArregloValor';
 import { Declaracion } from './../Instrucciones/Declaracion';
@@ -15,8 +17,176 @@ import { Exceptionn } from "../utilidad/Exceptionn";
  * @class Nodo expresion identificador que obtendra el valor de una variable
  */
 export class FuncionEjecutar extends Node {
-  codigo3direcciones(Tabla: Tabla, tree: Tree) {
-    throw new Error('Method not implemented.');
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+
+    let res=tabla.getVariable(this.id);
+    if(res===null)
+    {
+      const error = new Exceptionn('Semantico',`Funcion no existe `+this.id,this.line, this.column);tree.excepciones.push(error);
+      //tree.pila.pop();
+      return "error"
+    }
+
+    // lista de expresiones
+    if(this.ListaExpreciones.length!==res.FuncionListaId.length)
+    {
+      //console.log(this.ListaExpreciones)
+      //console.log(res.FuncionListaId)
+      const error = new Exceptionn('Semantico',`la llamada de funcion no tiene la misma cantidad de parametros funcion:`+this.id,this.line, this.column);tree.excepciones.push(error);
+      //tree.pila.pop();
+      return "error"
+    }
+
+    for (let x = 0; x < this.ListaExpreciones.length; x++) {
+
+      const element = this.ListaExpreciones[x];
+     // console.log("holaaaaa")
+      //console.log(dato);  // el . value tiene la puta pocision del stack
+
+      //dato es el valor de cada variable
+        if(tabla.Previous!==null)
+        {
+          if(element instanceof FuncionEjecutar)
+          {
+            element.codigo3direcciones(tabla,tree)
+          }
+
+        }
+
+  }
+
+
+
+
+
+
+    tree.codigo3d.push("//****Llamada Funcion****")
+    if(tabla.Previous===null)
+    {
+      //console.log(res)
+      //if(res.va)
+      tree.codigo3d.push(`${res.cantidadLlamadas}=10000;`);
+    }
+
+    let temporalesDatos:string[]=new Array();
+    if(tabla.Previous!==null)
+    {
+
+     // ${dato.value}
+    // let aux=tree.getContador();
+    tree.codigo3d.push(`//--------------------------------------------- `);
+      if(tree.etiquetaReturn.length>0)
+      {
+        let temp=tree.etiquetaReturn.pop();
+        tree.etiquetaReturn.push(temp);
+        tree.codigo3d.push(`stack[(int)${res.cantidadLlamadas}]=${temp};`)
+
+        tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}+1;`)
+      }
+
+
+
+      tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}+1;`);
+    }
+    for (let x = 0; x < this.ListaExpreciones.length; x++) {
+
+      const element = this.ListaExpreciones[x];
+      const element2=res.FuncionListaId[x];
+
+
+      let dato=res.entornoFuncion.getVariable(element2);
+
+     // console.log("holaaaaa")
+      //console.log(dato);  // el . value tiene la puta pocision del stack
+
+      //dato es el valor de cada variable
+        if(tabla.Previous!==null)
+        {
+         // ${dato.value}
+         let aux=tree.getContador();
+         tree.codigo3d.push(`//variable ->${dato.identifier} `);
+          tree.codigo3d.push(`t${aux}=stack[(int)${dato.value}];`);
+          tree.codigo3d.push(`stack[(int)${res.cantidadLlamadas}]=t${aux};`);
+          tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}+1;`);
+        }
+        if(element instanceof FuncionEjecutar)
+        {
+
+          tree.codigo3d.push(`t${dato.temporal}=${element.datojuan};`);
+        }else{
+        let valor=element.codigo3direcciones(tabla,tree);
+        tree.codigo3d.push(`t${dato.temporal}=${valor};`);
+        }
+  }
+
+  // guardaremos el valor del return
+
+ // tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`);
+  //console.log(res)
+  tree.codigo3d.push(`${res.identifier}();`);
+  //console.log(res)
+  if(res.type.type!==types.VOID)
+  {
+     this.type=res.type;
+      let valorReturn="t"+tree.getContador();
+     if(tabla.Previous!==null)
+     {
+      tree.codigo3d.push(`${valorReturn}=stack[(int)${res.cantidadLlamadas}];`);
+
+
+      tree.codigo3d.push("//*********************************************");
+      for (let x = res.FuncionListaId.length-1; x > -1; x--) {
+        const element = res.FuncionListaId[x];
+        let valorVariable=res.entornoFuncion.getVariable(element);
+        //obtenemos el puntero de cada variable
+        tree.codigo3d.push(`//variable ->${valorVariable.identifier} `);
+        //obtener el valor de la pila
+        let aux="t"+tree.getContador();//sera el valor de la pila
+        tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`);
+        tree.codigo3d.push(`${aux}=stack[(int)${res.cantidadLlamadas}];`);
+        tree.codigo3d.push(`stack[(int)${valorVariable.value}]=${aux};`);
+
+       }
+       //obtener el valor del return :v
+       tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`);
+
+     }
+
+     let valor="t"+tree.getContador();
+     tree.codigo3d.push(`//el valor del return`);
+     if(tabla.Previous===null)
+     {
+      tree.codigo3d.push(`${valor}=stack[(int)${res.temporalreturn}];`);
+      return valor;
+     }
+     else{
+
+      tree.codigo3d.push(`//obtener el valor de la llamada anterior`);
+      if(tree.etiquetaReturn.length>0)
+      {
+        let temp=tree.etiquetaReturn.pop();
+        //tree.etiquetaReturn.push(temp);
+        let cantidadDatos=1+this.ListaExpreciones.length;
+        tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`)
+        tree.codigo3d.push(`${temp}=stack[(int)${res.cantidadLlamadas}];`)
+
+      }
+
+
+
+      valor=valorReturn;
+      tree.etiquetaReturn.push(valor);
+
+        this.datojuan=valor;
+      return valor;
+     }
+    }
+
+
+
+
+  return "error";
+
   }
   Traducir(tabla: Tabla, tree: Tree) {
     //console.log(this);
@@ -74,6 +244,7 @@ tipo:boolean;
 valor:Object;
 datojuan:any;
 anidada:boolean
+listaDeValoresReturn:Array<string>;
 constructor(tipo:boolean,id:string,ListaExpreciones:Array<Node>,line:number,Column:number){
   super(null,line,Column);
   this.id=id;

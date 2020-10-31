@@ -1,3 +1,6 @@
+import { Continue } from './Continue';
+import { Break } from './Break';
+import { Return } from './Return';
 import { Asignacion } from './Asignacion';
 
 import { declararLista } from './declararLista';
@@ -13,8 +16,119 @@ import {Type, types} from "../utilidad/Type";
  * Permite imprimir expresiones en la consola
  */
 export class Funcion extends Node{
-  codigo3direcciones(Tabla: Tabla, tree: Tree) {
-    throw new Error('Method not implemented.');
+  codigo3direcciones(table: Tabla, tree: Tree) {
+    tree.etiquetaReturn=new Array<string>();;
+    let listaIDDeclaraciones=new Array<String>();
+    const res2 =table.getVariable(this.id);
+    if (res2 !== null) {
+      const error = new Exceptionn('Semantico',
+          "La Funcion "+ this.id+" ya ha sido declarada",
+          this.line, this.column);
+      tree.excepciones.push(error);
+      return null;
+    //  tree.console.push(error.toString());
+    }
+let Simbolo1=new Simbol(true,this.TipoFuncion,this.id,null);
+const res1 =table.setVariable(Simbolo1);
+if (res1 != null) {
+  const error = new Exceptionn('Semantico',
+      "La Funcion "+ this.id+" ya ha sido declarada",
+      this.line, this.column);
+  tree.excepciones.push(error);
+  return "error";
+}
+
+
+
+
+
+    tree.pila.push(new Type (types.FUNCION));
+    let etiquetaS=tree.getEtiqueta();
+    let etiquetaReturn="t"+tree.getContador();
+    tree.codigo3d.push(`void ${this.id}(){`);
+    tree.etiquetasS.push("L"+etiquetaS);
+  // hay que pasar las declaraciones aqui
+  let nuevaTabla=new Tabla(table);
+if(this.ListaDeclaraciones!=null)
+{
+  this.ListaDeclaraciones.forEach(element => {
+   // console.log(element)
+   listaIDDeclaraciones.unshift(element.identifier);
+     let sim=element.codigo3direcciones(nuevaTabla,tree);
+     sim.temporal=tree.getContador();
+     tree.codigo3d.push(`stack[(int)${sim.value}]=t${sim.temporal};`);
+     //temporal
+     sim.valorInicial=true;
+     const res2 = nuevaTabla.setVariable(sim);
+
+  });
+}
+
+let tablaInstrucciones=new Tabla(nuevaTabla);
+let Simbolo=table.getVariable(this.id);
+let vall=tree.getContador();
+tree.codigo3d.push(`t${vall}=s+${tree.getSTACK()};`);
+Simbolo.cantidadLlamadas="t"+tree.getContador();
+tree.punteroReturn=Simbolo.cantidadLlamadas;
+Simbolo.temporalreturn=tree.punteroReturn;
+Simbolo.entornoFuncion=nuevaTabla;
+Simbolo.FuncionListaId=listaIDDeclaraciones;
+
+
+
+let resultadoFinal=null;
+if(this.ListaInstrucciones!==null){
+  for (let x = 0; x < this.ListaInstrucciones.length; x++) {
+    let element = this.ListaInstrucciones[x];
+
+    let val=element.codigo3direcciones(tablaInstrucciones,tree);
+
+    if(val instanceof Return)
+    {
+      tree.etiquetaReturn=new Array<string>();;
+     // console.log("entra en el return funcion")
+      resultadoFinal=val.temporal
+     // tree.codigo3d.push(`goto L${etiquetaS};`);
+     // continue;
+      //aqui es lo pisado :c
+    }
+    if(val instanceof Break)
+    {
+      const error = new Exceptionn('Semantico',`No se esperaba un break`,this.line, this.column);tree.excepciones.push(error);
+
+    }
+    if(val instanceof Continue){
+      const error = new Exceptionn('Semantico',`No se esperaba un continue`,this.line, this.column);tree.excepciones.push(error);
+      }
+
+
+
+  }
+}
+tree.punteroReturn=Simbolo.cantidadLlamadas;
+
+// se guarda la funcion en la tabla de simbolos
+
+
+//let Simbolo=new Simbol(true,this.TipoFuncion,this.id,null);
+
+Simbolo.FuncionInstrucciones=this.ListaInstrucciones;
+
+
+
+    tree.pila.pop();
+    tree.etiquetasS.pop();
+    tree.codigo3d.push(`L${etiquetaS}:`);
+    if(resultadoFinal!=null){
+    tree.codigo3d.push(`${etiquetaReturn}=${resultadoFinal};`);
+    }
+    tree.codigo3d.push(`return;`);
+    tree.codigo3d.push(`}`);
+
+    tree.etiquetas=5;//L
+    tree.contadorP=0;
+    tree.contadorS=0;
+    return null;
   }
   Traducir(tabla: Tabla, tree: Tree) {
     if(this.ListaInstrucciones!=null){
@@ -175,6 +289,8 @@ return null;
  EsAnidada:boolean;
  column:number;
  NombreHijo:string;
+ returntemporal:string;
+ contadorLLamada:string;
  constructor(id:string,ListaDeclaraciones:Array<Declaracion>, TipoFuncion:Type,ListaInstrucciones:Array<Node>, line:number,column:number){
 super(null,line,column);
 this.line=line;
@@ -184,7 +300,7 @@ this.id=id;
 this.ListaInstrucciones=ListaInstrucciones;
 this.TipoFuncion=TipoFuncion;
 this.EsAnidada=false;
-this.NombreHijo="";
+this.contadorLLamada=this.NombreHijo="";
 
  }
   execute(table: Tabla, tree: Tree) {
@@ -228,6 +344,7 @@ for (let x=this.ListaDeclaraciones.length-1;x>= 0;x--){
   new declararLista(true,this.ListaDeclaraciones,this.line,this.column).execute(newTable,tree);
 
 }else{listaIDDeclaraciones=null;}
+
 
 
 if(this.TipoFuncion.type==types.OBJET){

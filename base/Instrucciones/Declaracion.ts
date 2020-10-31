@@ -28,11 +28,20 @@ if(this.value!==null)
  return simbol;
 
 }else{
+  //console.log(this)
   let contador=tree.getContador();
-  let simbol = new Simbol(this.TipoInicial,new Type(types.ANY), this.identifier,`t${contador}`);
+  let simbol:Simbol;
+  if(this.type==null){   simbol = new Simbol(this.TipoInicial,new Type(types.ANY), this.identifier,`t${contador}`);;}
+  else{  simbol  = new Simbol(this.TipoInicial,this.type, this.identifier,`t${contador}`);;}
+
   let stack=tree.getSTACK();
+  tree.codigo3d.push(`// declaracion`);
+  tree.codigo3d.push(`t${contador}=s+${stack};`);
    //let contador=tree.getContador();
   simbol.temporal=stack;
+  //if(this.type==null){this.type=new Type(types.ANY);}
+  //else{this.type=new Type(types.ANY);}
+//console.log(this.type);
 
   //tree.codigo3d.push("stask[t"+contador+"]=dato;");
  return simbol;

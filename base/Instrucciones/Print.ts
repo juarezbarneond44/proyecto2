@@ -10,12 +10,14 @@ import {Node} from "../Abstract/Node";
 import {Tree} from "../Simbols/Tree";
 import {Type} from "../utilidad/Type";
 import {types} from "../utilidad/Type";
+import { NULL_EXPR } from '@angular/compiler/src/output/output_ast';
 /**
  * Permite imprimir expresiones en la consola
  */
 export class Print extends Node{
   codigo3direcciones(tabla: Tabla, tree: Tree) {
     let data="";
+    console.log(tabla)
     if(this.expression!==null){
 
       if(this.expression.length===1)
@@ -33,6 +35,8 @@ export class Print extends Node{
 
             if(this.expression[0] instanceof Primitive)
               {
+
+
                // let aux:string=this.expression[0].codigo3direcciones(tabla,tree);
                let aux:string=""+data;
                 for (const iterator of aux)
@@ -71,8 +75,19 @@ export class Print extends Node{
        else if(this.expression[0].type.type==types.NUMERIC)
        {
 
-       tree.codigo3d.push("printf(\"%f\","+data+");");
-       tree.codigo3d.push("printf(\"%c\",10);");
+          let etiqueta=tree.getContador();
+        tree.codigo3d.push(`t${etiqueta}=p;`);
+        tree.codigo3d.push(`t2=${data};`);
+        tree.codigo3d.push(`NumberToString();`);
+        tree.codigo3d.push("t0=p;");
+        tree.codigo3d.push("t1=-1;");
+        tree.codigo3d.push("guardarString();");
+        tree.codigo3d.push(`t0=t${etiqueta};`);
+        tree.codigo3d.push("imprimirString();");
+        tree.codigo3d.push(`printf("%c",10);`);
+
+
+
 
        }
        else if(this.expression[0].type.type==types.BOOLEAN)
@@ -106,16 +121,24 @@ export class Print extends Node{
       }else
       {
         for (let x =this.expression.length-1; x >-1; x--) {
-          data=data+this.expression[x].codigo3direcciones(tabla,tree);
-          if(x-1>-1){data=data+",";}
-        }
+         let val=this.expression[x];
+         // if(x-1>-1){data=data+",";}
+         let aux=new  Print([val],this.line,this.column).codigo3direcciones(tabla,tree);
+           tree.codigo3d.pop();
+           //tree.codigo3d.push("printf(\"%c\",44);");
+           tree.codigo3d.push("printf(\"%c\",32);");
 
-        tree.codigo3d.push("printf(\"%f\","+data+");");
+        }
+        tree.codigo3d.push("printf(\"%c\",10);");
+
+       // tree.codigo3d.push("printf(\"%f\","+data+");");
       }
 
 
 
     }
+
+
   }
   Traducir(Tabla: Tabla, tree: Tree) {
    let data="";

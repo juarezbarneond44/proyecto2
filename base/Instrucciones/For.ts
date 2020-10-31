@@ -15,6 +15,7 @@ import { trace } from 'console';
 export class For extends Node{
   codigo3direcciones(tabla: Tabla, tree: Tree) {
     tree.pila.push(new Type (types.CICLO));
+    let valorsalida:object=null
     let nueva=new Tabla(tabla);
     tree.codigo3d.push("// *****for*****")
     let etiquetaFor=tree.getEtiqueta();
@@ -24,6 +25,7 @@ export class For extends Node{
 
     let etiquetaV=tree.getEtiqueta();
     let etiquetaF=tree.getEtiqueta();
+    tree.etiquetasS.push("L"+etiquetaF);
 
     tree.codigo3d.push(`if(${exprecion}==1) goto L${etiquetaV};`)
     tree.codigo3d.push(`goto L${etiquetaF};`)
@@ -46,9 +48,9 @@ if(this.Instrucciones!=null)
     }
     else if(res instanceof Return)
     {
-      tree.codigo3d.push(`L${etiquetaF}:`)
-      tree.pila.pop();
-     return res
+      if(valorsalida===null){valorsalida= res;   tree.codigo3d.push(`goto L${etiquetaF};`)}
+
+
     }
   });
 }
@@ -56,7 +58,9 @@ if(this.Instrucciones!=null)
     this.Incremento.codigo3direcciones(nueva,tree);
     tree.codigo3d.push(`goto L${etiquetaFor};`)
     tree.codigo3d.push(`L${etiquetaF}:`)
+    tree.etiquetasS.pop();
     tree.pila.pop();
+    return valorsalida;
   }
 
 

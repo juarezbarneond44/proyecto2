@@ -8,8 +8,14 @@ import { Simbol } from "../Simbols/Simbol";
  * Permite imprimir expresiones en la consola
  */
 export class GraficarEntorno extends Node{
-  codigo3direcciones(Tabla: Tabla, tree: Tree) {
-    throw new Error('Method not implemented.');
+  codigo3direcciones(table: Tabla, tree: Tree) {
+    let aux=table;
+    // recorrer la tabla de simbolos
+    while(aux.Previous!=null){
+      aux=aux.Previous;
+    }
+    aux.setVariable(new Simbol(true,null,"GraficarEntornosJuanito44",table));
+    return null;
   }
   Traducir(Tabla: Tabla, tree: Tree) {
     tree.Traduccion.push("graficar_ts;")

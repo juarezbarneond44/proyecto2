@@ -19,8 +19,8 @@ export class DoWhile extends Node{
     let etiquetaWhile=tree.getEtiqueta();
     tree.codigo3d.push(`L${etiquetaWhile}:`)
     let etiquetaF=tree.getEtiqueta();
-
-
+    tree.etiquetasS.push("L"+etiquetaF);
+    let valorSalida:object=null
 if(this.Instruciones!=null)
 {
 
@@ -39,9 +39,10 @@ for (let x = 0; x < this.Instruciones.length; x++) {
     }
     else if(res instanceof Return)
     {
-      tree.codigo3d.push(`L${etiquetaF}:`)
-      tree.pila.pop();
-     return res
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+     // tree.codigo3d.push(`L${etiquetaF}:`)
+    //  tree.pila.pop();
+    valorSalida= res;
     }
   }
 }
@@ -51,7 +52,9 @@ for (let x = 0; x < this.Instruciones.length; x++) {
     tree.codigo3d.push(`if(${exprecion}==1) goto L${etiquetaWhile};`)
     tree.codigo3d.push(`goto L${etiquetaF};`)
     tree.codigo3d.push(`L${etiquetaF}:`)
+    tree.etiquetasS.pop();
     tree.pila.pop();
+    return valorSalida;
   }
   Traducir(tabla: Tabla, tree: Tree) {
     const newtable = new Tabla(tabla);

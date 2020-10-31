@@ -234,7 +234,7 @@ ArregloPOP: identifier ARRAYBUSCAR '.' 'pop' '(' ')'{$$=new ArrayPop($1,$2,@1.fi
             |identifier '.' 'pop' '(' ')'  {$$=new ArrayPop($1,null,@1.first_line,  @1.first_column)}
 ;
 
-GRAFICARENTORNO:'graficar_ts' ';' {$$=new GraficarEntorno(@1.first_line,  @1.first_column);};
+GRAFICARENTORNO:'graficar_ts' '(' ')'';' {$$=new GraficarEntorno(@1.first_line,  @1.first_column);};
 
 
 AsignarArreglo: 'identifier' ARRAYBUSCAR '=' ARRAYLISTA1 {$$=new ArrayInstruccion($1,$2,$4,null,@1.first_line,  @1.first_column);}

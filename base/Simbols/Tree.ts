@@ -13,11 +13,13 @@ export class Tree {
     codigo3d: Array<String>;
     Encabezadocodigo3d: Array<String>;
     pila: Array<Type>;
+    etiquetasS: Array<string>;
     contador:number;
     etiquetas:number;
     contadorP:number;
     contadorS:number;
-
+    punteroReturn:string;
+    etiquetaReturn: Array<string>;
 
     /**
      * Retorna un arbol con 2 atributos: 1 ast y 1 lista de excepciones
@@ -30,6 +32,8 @@ export class Tree {
         this.Traduccion = new Array<String>();
         this.codigo3d = new Array<String>();
         this.Encabezadocodigo3d= new Array<String>();
+        this.etiquetaReturn= new Array<string>();
+
        // this.codigo3d.push("#include <stdio.h>");
        // this.codigo3d.push("float heap[16384];");
        // this.codigo3d.push("float stack[16394];");
@@ -333,9 +337,8 @@ export class Tree {
 
 
 // aqui vendrian mas funciones nativas
-        this.Encabezadocodigo3d.push("void main(){");
 
-
+this.etiquetasS=new Array<string>();
         this.pila=new Array<Type>();
         this.contador=10;//T
         this.etiquetas=5;//L

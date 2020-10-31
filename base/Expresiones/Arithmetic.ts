@@ -1,3 +1,5 @@
+import { Identificador } from './Identificador';
+import { FuncionEjecutar } from './FuncionEjecutar';
 import { Primitive } from './Primitive';
 
 import { Node } from "../Abstract/Node";
@@ -11,11 +13,34 @@ import { types, Type } from "../utilidad/Type";
  */
 export class Arithmetic extends Node {
   codigo3direcciones(Tabla: Tabla, tree: Tree) {
+    try{
     let izquierdo="";
     let derecho="";
     let data="";
-    if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+    //if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+    //if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+    if(this.leftOperator instanceof FuncionEjecutar||this.rightOperator instanceof FuncionEjecutar)
+    {
+      if (this.rightOperator instanceof FuncionEjecutar)
+      {
+
+        if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+        if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+      }
+      else if (this.leftOperator instanceof FuncionEjecutar)
+      {
+        if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+        if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+      }
+
+    }else
+    {
+       if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
     if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+    }
+
+
+
 
     if(this.Operator==="+"){
 
@@ -126,8 +151,13 @@ export class Arithmetic extends Node {
     }
     else if(this.Operator==="*")
     {
+      console.log(this)
       if(this.leftOperator.type.type===types.NUMERIC&&this.rightOperator.type.type===types.NUMERIC)
       {
+
+
+
+
         const contador=tree.getContador();
         tree.codigo3d.push(`//multiplicacion *`);
         data="t"+contador+"="+ izquierdo+this.Operator+derecho+";";
@@ -500,7 +530,7 @@ export class Arithmetic extends Node {
 
 return "error";
 
-
+  }catch(error){this.type = new Type(types.ERROR);return "error";}
   }
   Traducir(Tabla: Tabla, tree: Tree) {
 let izquierdo="";

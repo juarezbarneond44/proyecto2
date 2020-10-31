@@ -20,10 +20,10 @@ export class While extends Node{
     let exprecion=this.exprecion.codigo3direcciones(nueva,tree);
     let etiquetaV=tree.getEtiqueta();
     let etiquetaF=tree.getEtiqueta();
-
+    let valorsalida:object=null
     tree.codigo3d.push(`if(${exprecion}==1) goto L${etiquetaV};`)
     tree.codigo3d.push(`goto L${etiquetaF};`)
-
+    tree.etiquetasS.push("L"+etiquetaF);
     tree.codigo3d.push(`L${etiquetaV}:`)
 if(this.Instruciones!=null)
 {
@@ -41,9 +41,11 @@ if(this.Instruciones!=null)
     }
     else if(res instanceof Return)
     {
-      tree.codigo3d.push(`L${etiquetaF}:`)
-      tree.pila.pop();
-     return res
+      valorsalida=res;
+      tree.codigo3d.push(`goto L${etiquetaWhile};`)
+     // tree.codigo3d.push(`L${etiquetaF}:`)
+     // tree.pila.pop();
+   //  return res
     }
 
   }
@@ -54,6 +56,8 @@ if(this.Instruciones!=null)
     tree.codigo3d.push(`goto L${etiquetaWhile};`)
     tree.codigo3d.push(`L${etiquetaF}:`)
     tree.pila.pop();
+    tree.etiquetasS.pop();
+    return valorsalida;
   }
 
 Traducir(tabla: Tabla, tree: Tree) {

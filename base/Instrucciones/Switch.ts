@@ -38,6 +38,10 @@ export class Switch extends Node{
         element.etiquetaV=val;
       }
     });
+
+
+    let valorSalida:string="";
+    let valorReturnInicial:object=null;
     this.ListaInstrucciones.forEach(element => {
       if(element instanceof Case)
       {
@@ -45,7 +49,24 @@ export class Switch extends Node{
         element.temporal=this.expression;
         element.etiqueta="L"+etiqueta;
       }
-      element.codigo3direcciones(nueva,tree);
+     let res= element.codigo3direcciones(nueva,tree);
+     if (res instanceof Return)
+     {
+      //tree.codigo3d.push(`//return del swhit*******************`);
+    //  console.log("holaaaaaaaaaa  "+valorSalida+"  "+res.temporal)
+       if(valorSalida===""){
+         valorSalida=res.temporal;
+         valorReturnInicial=res;
+         let valor=tree.etiquetasS.pop();tree.etiquetasS.push(valor);
+         tree.codigo3d.push(`goto ${valor};`);
+
+        }
+      else{
+         //tree.codigo3d.push(`${valorSalida}=${res.temporal};`);
+           let valor=tree.etiquetasS.pop();tree.etiquetasS.push(valor);
+           tree.codigo3d.push(`goto ${valor};`);}
+
+     }
     });
 
 
@@ -53,6 +74,7 @@ export class Switch extends Node{
 
     tree.codigo3d.push("L"+etiqueta+":");
     tree.pila.pop();
+    return valorReturnInicial;
   }
 
 

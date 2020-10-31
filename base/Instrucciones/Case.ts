@@ -23,11 +23,7 @@ export class Case extends Node{
       let expresion=comparacion.codigo3direcciones(tabla,tree);
      // console.log(expresion)
      this.etiquetaV=tree.getEtiqueta();
-     //tree.codigo3d.push(`t0=${this.temporal};`);
-     // tree.codigo3d.push(`${expresion};`);
-      //tree.codigo3d.push(`compararString();`);
-      //tree.codigo3d.push(`******${expresion}****`);
-     // tree.codigo3d.push("//********terminar*******")
+
     tree.codigo3d.push(`if(1==${expresion})goto L${this.etiquetaV};`);
      // tree.codigo3d.push(`if(${this.temporal}==${expresion})goto L${this.etiquetaV};`);
     return false;
@@ -36,23 +32,28 @@ export class Case extends Node{
       else{
       tree.codigo3d.push("//********case*******")
       tree.codigo3d.push(`L${this.etiquetaV}:`);
-      if(this.ListaInstrucciones!==null){
+let returnvalor:Object=null;
+     if(this.ListaInstrucciones!==null){
 for (let x = 0; x <  this.ListaInstrucciones.length; x++) {
   const element =  this.ListaInstrucciones[x];
       let res=element.codigo3direcciones(tabla,tree);
     // si es break;
     if(res instanceof Break ){
+
     tree.codigo3d.push(`goto ${this.etiqueta};`);
       }
    else  if(res instanceof Continue ){
+
+
     tree.codigo3d.push(`goto ${this.etiqueta};`);
-    return res;
-          }
+    if(returnvalor===null){returnvalor= res;}
+     }
+     else  if(res instanceof Return ){
+       returnvalor= res;
+    }
     }
       }
-    //  tree.codigo3d.push(`L${this.etiquetaF}:`);
-
-
+return returnvalor;
 
 
     }
@@ -85,7 +86,7 @@ for (let x = 0; x <  this.ListaInstrucciones.length; x++) {
     SoloExpresion:boolean;
     etiquetaV:number;
     etiquetaFinal:string;
-
+    valorSalida:object
     constructor(expression: Node, ListaInstrucciones:Array<Node>,line: number, column: number){
         super(null, line, column);
         this.expression = expression;
@@ -93,7 +94,7 @@ for (let x = 0; x <  this.ListaInstrucciones.length; x++) {
         this.SoloExpresion=this.bandera = false;
         this.etiqueta=null;
         this.etiquetaV=-1;
-
+        this.valorSalida=null;
 
     }
 

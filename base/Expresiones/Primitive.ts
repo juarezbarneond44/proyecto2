@@ -17,14 +17,52 @@ export class Primitive extends Node{
 
           // let aux:string=this.expression[0].codigo3direcciones(tabla,tree);
           let data:string=this.value+"";
-           for (const iterator of data)
-           {
-             tree.codigo3d.push("//agregamos el string al heap");
-             tree.codigo3d.push("t0=p;");
+          let estado=0;
+          for (let x = 0; x < data.length; x++) {
+            const iterator = data[x];
+              switch(estado){
+              case 0:{
+                if(iterator=="\\"){estado=1; continue;}
+              tree.codigo3d.push("//agregamos el string al heap");
+              tree.codigo3d.push("t0=p;");
 
-             tree.codigo3d.push("t1="+iterator.charCodeAt(0)+";");
-             tree.codigo3d.push("guardarString();");
-           }
+              tree.codigo3d.push("t1="+iterator.charCodeAt(0)+";");
+              tree.codigo3d.push("guardarString();");
+              break;
+               }
+               case 1:
+                 {
+                   let assci=0;
+                  if(iterator=="n"){assci=10;}
+                  else if(iterator=="\""){assci=34;}
+                  else if(iterator=="\\"){assci=92}
+                  else if(iterator=="r"){assci=10}
+                  else if(iterator=="t"){assci=9;}
+                  else
+                  {tree.codigo3d.push("//agregamos el string al heap");
+                  tree.codigo3d.push("t0=p;");
+
+                  tree.codigo3d.push("t1="+34+";");
+                  tree.codigo3d.push("guardarString();");
+                  tree.codigo3d.push("//agregamos el string al heap");
+                  tree.codigo3d.push("t0=p;");
+
+                  tree.codigo3d.push("t1="+iterator.charAt(0)+";");
+                  tree.codigo3d.push("guardarString();");
+                }
+                  tree.codigo3d.push("//agregamos el string al heap");
+                  tree.codigo3d.push("t0=p;");
+
+                  tree.codigo3d.push("t1="+assci+";");
+                  tree.codigo3d.push("guardarString();");
+                  estado=0;
+                   break;
+                 }
+              }
+            }
+
+
+
            tree.codigo3d.push("t0=p;");
            tree.codigo3d.push("t1=-1;");
            tree.codigo3d.push("guardarString();");
@@ -33,6 +71,7 @@ export class Primitive extends Node{
            const contador=tree.getContador();
            tree.codigo3d.push("t"+contador+"=p-"+(data.length+1)+";");
            return "t"+contador;
+
           // tree.codigo3d.push("printf(\"%c\",10);");
 
          }
