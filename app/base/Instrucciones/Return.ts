@@ -12,6 +12,20 @@ import {Type} from "../utilidad/Type";
 import {types} from "../utilidad/Type";
 
 export class Return extends Node{
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+// aqui si esta fea la cosa  u.u
+if(this.Exprecion!==null)
+{
+  tree.codigo3d.push("//***return***")
+  let valor =this.Exprecion.codigo3direcciones(tabla,tree);
+  //let etiquetaReturn=tree.getContador()
+  //tree.codigo3d.push("//----------------------------------------------------------")
+    tree.codigo3d.push(`stack[(int)${tree.punteroReturn}]=${valor};`);
+  //this.temporal="t"+etiquetaReturn;
+  return this;
+}
+else {return this;}
+  }
   Traducir(Tabla: Tabla, tree: Tree) {
     let data="return ";
     let valor="";
@@ -26,10 +40,12 @@ tree.Traduccion.push(data+arregloDato1+";");
     tree.Traduccion.push(data+valor+";")
     return null;
   }
+  temporal:string;
  entro:boolean;
   Exprecion:Node;
   dato:object;
   arrays:Array<Node>;
+
       constructor(exprecion:Node,line: number, column: number) {
       super(null, line, column);
       this.entro=false;
@@ -47,16 +63,16 @@ tree.Traduccion.push(data+arregloDato1+";");
         if(this.Exprecion==null){
           if(this.arrays!==null){
 // arreglo
-     let valore:ArregloValor= new ArregloValor(true,this.arrays,10,this.line,this.column).execute(table,tree)
+    let valore:ArregloValor= new ArregloValor(true,this.arrays,10,this.line,this.column).execute(table,tree)
     let dato1=new Type(types.OBJET);
     dato1.typeObjeto=types.ARRAY
     if(valore.type!==null){
-      dato1.typeArray=valore.type.type;
+    dato1.typeArray=valore.type.type;
 
     }else{this.type=new Type(types.ARRAY)}
 
 
-this.type=dato1;
+      this.type=dato1;
       this.dato=valore;
       return this;
           }

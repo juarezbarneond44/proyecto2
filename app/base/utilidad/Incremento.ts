@@ -10,6 +10,56 @@ import {types} from "./Type";
 
 
 export class Incremento extends Node{
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+   let variable = tabla.getVariable(this.id);
+
+    if (variable == null) {
+        const error = new Exceptionn('Semantico',
+            'No se ha encontrado la variable ' + this.id,
+            this.line, this.column);
+        tree.excepciones.push(error);
+        if(this.TipoOperacion){
+          return null;
+        }
+        return error;
+    }
+    if(variable.type.type!=types.NUMERIC){
+      const error = new Exceptionn('Semantico',
+      'Solo se puede hacer la operacion con un numero ' + variable.type.type,
+      this.line, this.column);
+      tree.excepciones.push(error);
+      if(this.TipoOperacion){
+    return null;
+  }
+      return error;
+
+    }
+
+    let operador=""  ;
+    if(this.TipoFuncion)
+    {
+      let contador=tree.getContador();
+      tree.codigo3d.push(`t${contador}=stack[(int)${variable.value}];`);
+      tree.codigo3d.push(`stack[(int)${variable.value}]=t${contador}+1;`);
+      if(this.TipoOperacion){return null;}
+
+      else { this.type=variable.type; return `t${contador}`;
+    }
+    }
+  else{
+    let contador=tree.getContador();
+    tree.codigo3d.push(`t${contador}=stack[(int)${variable.value}];`);
+    tree.codigo3d.push(`stack[(int)${variable.value}]=t${contador}-1;`);
+  if(this.TipoOperacion){return null;}
+
+  else { this.type=variable.type; return `t${contador}`;
+  }
+}
+
+
+
+    //throw new Error('Method not implemented.');
+  }
 Traducir(Tabla: Tabla, tree: Tree) {
   let operador=""  ;
   if(this.TipoFuncion){operador="++";}

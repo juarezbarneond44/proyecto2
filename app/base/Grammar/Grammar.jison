@@ -1,48 +1,52 @@
 %{
-    const {Primitive} = require('../Expresiones/Primitive');
-    const {Arithmetic} = require('../Expresiones/Arithmetic');
-    const {Identificador} = require('../Expresiones/Identificador');
-    const {Ternario} = require('../Expresiones/Ternario');
-    const {Print} = require('../Instrucciones/Print');
-    const {Excepcionn} = require('../utilidad/Exceptionn');
-    const {Type, types} = require('../utilidad/Type');
-    const {Tree} = require('../Simbols/Tree');
-    const {Declaracion} = require('../Instrucciones/Declaracion');
-    const {Asignacion} = require('../Instrucciones/Asignacion');
-    const {declararLista} = require('../Instrucciones/declararLista');
-    const {While} = require('../Instrucciones/While');
-    const {IF} = require('../Instrucciones/IF');
-    const {DoWhile} = require('../Instrucciones/DoWhile');
-    const {Incremento} = require('../utilidad/Incremento');
-   const {Exceptionn} = require('../utilidad/Exceptionn');
-    const {For} = require('../Instrucciones/For');
-    const {Case} = require('../Instrucciones/Case');
-    const {Switch} = require('../Instrucciones/Switch');
-    const {Break} = require('../Instrucciones/Break');
-    const {Continue} = require('../Instrucciones/Continue');
-    const {Return} = require('../Instrucciones/Return');
-    const {Funcion} = require('../Instrucciones/Funcion');
-    const {TypeDeclaracion} = require('../Instrucciones/TypeDeclaracion');
-    const {FuncionEjecutar} = require('../Expresiones/FuncionEjecutar')
-      const {Parentesis} = require('../Expresiones/Parentesis');
-    const {DeclararType} = require('../Instrucciones/DeclararType');
-    const {IdentificadorExprecion} = require('../Instrucciones/IdentificadorExprecion');
-    const {ListaIdentificado} = require('../Instrucciones/ListaIdentificado');
-    const {ForIn} = require('../Instrucciones/ForIn');
-    const {IDArray} = require('../Instrucciones/IDArray');
-    const {GraficarEntorno} = require('../Instrucciones/GraficarEntorno');
-   const {ForOF} = require('../Instrucciones/ForOF');
-    const {StringEspecial} = require('../Expresiones/StringEspecial');
-        const {ArrayBusqueda} = require('../Expresiones/ArrayBusqueda');
-            const {ArrayInstruccion} = require('../Instrucciones/ArrayInstruccion');
-                const {ArrayLength} = require('../Expresiones/ArrayLength');
-                 const {ArraPush} = require('../Instrucciones/ArraPush');
-                  const {ArrayPop} = require('../Instrucciones/ArrayPop');
+const {Primitive} = require('../Expresiones/Primitive');
+const {Arithmetic} = require('../Expresiones/Arithmetic');
+const {Identificador} = require('../Expresiones/Identificador');
+const {Ternario} = require('../Expresiones/Ternario');
+const {Print} = require('../Instrucciones/Print');
+const {Excepcionn} = require('../utilidad/Exceptionn');
+const {Type, types} = require('../utilidad/Type');
+const {Tree} = require('../Simbols/Tree');
+const {Declaracion} = require('../Instrucciones/Declaracion');
+const {Asignacion} = require('../Instrucciones/Asignacion');
+const {declararLista} = require('../Instrucciones/declararLista');
+const {While} = require('../Instrucciones/While');
+const {IF} = require('../Instrucciones/IF');
+const {DoWhile} = require('../Instrucciones/DoWhile');
+const {Incremento} = require('../utilidad/Incremento');
+const {Exceptionn} = require('../utilidad/Exceptionn');
+const {For} = require('../Instrucciones/For');
+const {Case} = require('../Instrucciones/Case');
+const {Switch} = require('../Instrucciones/Switch');
+const {Break} = require('../Instrucciones/Break');
+const {Continue} = require('../Instrucciones/Continue');
+const {Return} = require('../Instrucciones/Return');
+const {Funcion} = require('../Instrucciones/Funcion');
+const {TypeDeclaracion} = require('../Instrucciones/TypeDeclaracion');
+const {FuncionEjecutar} = require('../Expresiones/FuncionEjecutar')
+const {Parentesis} = require('../Expresiones/Parentesis');
+const {DeclararType} = require('../Instrucciones/DeclararType');
+const {IdentificadorExprecion} = require('../Instrucciones/IdentificadorExprecion');
+const {ListaIdentificado} = require('../Instrucciones/ListaIdentificado');
+const {ForIn} = require('../Instrucciones/ForIn');
+const {IDArray} = require('../Instrucciones/IDArray');
+const {GraficarEntorno} = require('../Instrucciones/GraficarEntorno');
+const {ForOF} = require('../Instrucciones/ForOF');
+const {StringEspecial} = require('../Expresiones/StringEspecial');
+const {ArrayBusqueda} = require('../Expresiones/ArrayBusqueda');
+const {ArrayInstruccion} = require('../Instrucciones/ArrayInstruccion');
+const {ArrayLength} = require('../Expresiones/ArrayLength');
+const {ArraPush} = require('../Instrucciones/ArraPush');
+const {ArrayPop} = require('../Instrucciones/ArrayPop');
+const {StringLength} = require('../Expresiones/StringLength');
+const {StringCharAt} = require('../Expresiones/StringCharAt');
+const {StringToLowerCase} = require('../Expresiones/StringToLowerCase');
+const {StringToUpperCase} = require('../Expresiones/StringToUpperCase');
+const {StringConcat} = require('../Expresiones/StringConcat');
 
-
- var pilaFuncion=new Array();
- var pilaError=new Array();
-  var pilaprint=new Array();
+var pilaFuncion=new Array();
+var pilaError=new Array();
+var pilaprint=new Array();
 var token_error;
 
 %}
@@ -66,7 +70,7 @@ sringSpecial ((\`[^`]*\`) )
 {decimal}              return 'decimal'
 {sringSpecial}       return 'STRINGESPECIAL'
 {stringliteral}       return 'STRING_LITERAL'
-"*"                   return '*'
+"**"                   return '**'
 "/"                   return '/'
 ";"                   return ';'
 "--"                   return '--'
@@ -76,7 +80,7 @@ sringSpecial ((\`[^`]*\`) )
 "+"                   return '+'
 
 "?"                   return '?'
-"**"                   return '**'
+
 "*"                   return '*'
 ":"                   return ':'
 
@@ -93,6 +97,12 @@ sringSpecial ((\`[^`]*\`) )
 "&&"                  return '&&'
 "!"                   return '!'
 "="                   return '='
+".length"                return '.length'
+".charAt"                return '.charAt'
+".toLowerCase"          return '.toLowerCase'
+".toUpperCase"          return '.toUpperCase'
+".concat"              return '.concat'
+
 "."                   return '.'
 
 "("                   return '('
@@ -101,9 +111,14 @@ sringSpecial ((\`[^`]*\`) )
 "]"                   return ']'
 "{"                   return '{'
 "}"                   return '}'
+
 "true"                return 'true'
 "return"                return 'return'
 "graficar_ts"          return 'graficar_ts'
+"for"                return 'for'
+
+
+
 "for"                return 'for'
 "in"                return 'in'
 "of"              return 'of'
@@ -127,7 +142,7 @@ sringSpecial ((\`[^`]*\`) )
 "boolean"             return 'boolean'
 "push"             return 'push'
 "do"             return 'do'
-"length"             return 'length'
+
 "void"             return 'void'
 "Array"             return 'Array'
 "type"             return 'type'
@@ -150,10 +165,12 @@ sringSpecial ((\`[^`]*\`) )
 %left '+' '-''++''--'
 %left '*' '/' '%'
 %left '**'
+%left '.length','.charAt','.toLowerCase','.toUpperCase','.concat'
 
 
 %right '!'
 %left UMENOS
+
 
 
 %start INICIO
@@ -207,7 +224,7 @@ INSTRUCCION : PRINT  ';' {$$ = $1;}
             |ArregloPUSH ';'{$$=$1}
             |ArregloPOP ';'{$$=$1}
 
-           |  ERROR {}
+           //|  ERROR {}
             ;
 
 ArregloPUSH: identifier ARRAYBUSCAR '.' 'push' '(' EXPRESION')'{$$=new ArraPush($1,$2,$6,@1.first_line,  @1.first_column)}
@@ -217,7 +234,7 @@ ArregloPOP: identifier ARRAYBUSCAR '.' 'pop' '(' ')'{$$=new ArrayPop($1,$2,@1.fi
             |identifier '.' 'pop' '(' ')'  {$$=new ArrayPop($1,null,@1.first_line,  @1.first_column)}
 ;
 
-GRAFICARENTORNO:'graficar_ts' ';' {$$=new GraficarEntorno(@1.first_line,  @1.first_column);};
+GRAFICARENTORNO:'graficar_ts' '(' ')'';' {$$=new GraficarEntorno(@1.first_line,  @1.first_column);};
 
 
 AsignarArreglo: 'identifier' ARRAYBUSCAR '=' ARRAYLISTA1 {$$=new ArrayInstruccion($1,$2,$4,null,@1.first_line,  @1.first_column);}
@@ -427,7 +444,7 @@ EXPRESION :'-'EXPRESION %prec UMENOS	    { $$ = new Arithmetic($2, null, '-', @1
           |EXPRESION '*' EXPRESION		    { $$ = new Arithmetic($1, $3, '*', @1.first_line, @1.first_column); }
           |EXPRESION '/' EXPRESION	          { $$ = new Arithmetic($1, $3, '/', @1.first_line, @1.first_column); }
           |EXPRESION '%' EXPRESION	          { $$ = new Arithmetic($1, $3, '%', @1.first_line, @1.first_column); }
-          |EXPRESION '*''*' EXPRESION	          { $$ = new Arithmetic($1, $4, '**', @1.first_line, @1.first_column); }
+          |EXPRESION '**' EXPRESION	          { $$ = new Arithmetic($1, $3, '**', @1.first_line, @1.first_column); }
           |'decimal'				    { $$ = new Primitive(new Type(types.NUMERIC), Number($1), @1.first_line, @1.first_column); }
           |'true'				    { $$ = new Primitive(new Type(types.BOOLEAN), true, @1.first_line, @1.first_column); }
           |'false'				    { $$ = new Primitive(new Type(types.BOOLEAN), false, @1.first_line, @1.first_column); }
@@ -452,11 +469,17 @@ EXPRESION :'-'EXPRESION %prec UMENOS	    { $$ = new Arithmetic($2, null, '-', @1
           |STRINGESPECIAL { $1= $1.replace(/\`/g,"") ;$$ = new StringEspecial(new Type(types.STRING),$1, @1.first_line, @1.first_column);}
           | LISTADEIDS  {$$ = new ListaIdentificado(true,$1,null,@1.first_line,  @1.first_column);}
           | identifier ARRAYBUSCAR  {$$ = new ArrayBusqueda($1,$2,@1.first_line,  @1.first_column);}
-          | identifier ARRAYBUSCAR '.' 'length'  {$$ = new ArrayLength($1,$2,@1.first_line,  @1.first_column);}
-          | identifier  '.' 'length'  {$$ = new ArrayLength($1,null,@1.first_line,  @1.first_column);}
+         // | identifier ARRAYBUSCAR '.' 'length'  {$$ = new ArrayLength($1,$2,@1.first_line,  @1.first_column);}
+          //| identifier  '.length'  {$$ = new ArrayLength($1,null,@1.first_line,  @1.first_column);}
           |  ArregloPOP {$$=$1}
-         // | ARRAYLISTA1 {$$=null}
-          ;
+          |  EXPRESION '.length' 	 {$$ = new StringLength($1,@1.first_line,  @1.first_column);}
+          |  EXPRESION '.charAt'  '('EXPRESION')'	 {$$ = new StringCharAt($1,$4,@1.first_line,  @1.first_column);}
+          |  EXPRESION '.toLowerCase' '('')'	 {$$ = new StringToLowerCase($1,@1.first_line,  @1.first_column);}
+          |  EXPRESION '.toUpperCase' '('')'	 {$$ = new StringToUpperCase($1,@1.first_line,  @1.first_column);}
+          |  EXPRESION '.concat' '('EXPRESION')'	 {$$ = new StringConcat($1,$4,@1.first_line,  @1.first_column);}
+
+         ;
+
 
 ARRAYBUSCAR: ARRAYBUSCAR '['EXPRESION']' {$$=$1;$$.push($3);}
  |'['EXPRESION']'{$$=[$2]}

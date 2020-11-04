@@ -10,6 +10,9 @@ import {types} from "../utilidad/Type";
 
 
 export class ArrayInstruccion extends Node{
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+    throw new Error('Method not implemented.');
+  }
   Traducir(tabla: Tabla, tree: Tree) {
 
 

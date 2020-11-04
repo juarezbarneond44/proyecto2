@@ -12,6 +12,50 @@ import { Break } from '../Instrucciones/Break';
  * Permite imprimir expresiones en la consola
  */
 export class DoWhile extends Node{
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+    tree.pila.push(new Type (types.CICLO));
+    let nueva=new Tabla(tabla);
+    tree.codigo3d.push("// *****Do while*****")
+    let etiquetaWhile=tree.getEtiqueta();
+    tree.codigo3d.push(`L${etiquetaWhile}:`)
+    let etiquetaF=tree.getEtiqueta();
+    tree.etiquetasS.push("L"+etiquetaF);
+    let valorSalida:object=null
+if(this.Instruciones!=null)
+{
+
+for (let x = 0; x < this.Instruciones.length; x++) {
+  let element =this.Instruciones[x];
+    let res= element.codigo3direcciones(nueva,tree);
+    if(res instanceof Break)
+    {
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+    }
+     else if(res instanceof Continue)
+    {
+      let exprecion=this.exprecion.codigo3direcciones(nueva,tree);
+      tree.codigo3d.push(`if(${exprecion}==1) goto L${etiquetaWhile};`)
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+    }
+    else if(res instanceof Return)
+    {
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+     // tree.codigo3d.push(`L${etiquetaF}:`)
+    //  tree.pila.pop();
+    valorSalida= res;
+    }
+  }
+}
+    // hay que hacer el incremento
+
+    let exprecion=this.exprecion.codigo3direcciones(nueva,tree);
+    tree.codigo3d.push(`if(${exprecion}==1) goto L${etiquetaWhile};`)
+    tree.codigo3d.push(`goto L${etiquetaF};`)
+    tree.codigo3d.push(`L${etiquetaF}:`)
+    tree.etiquetasS.pop();
+    tree.pila.pop();
+    return valorSalida;
+  }
   Traducir(tabla: Tabla, tree: Tree) {
     const newtable = new Tabla(tabla);
     let data="do{";

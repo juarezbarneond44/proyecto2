@@ -1,3 +1,4 @@
+import { Arithmetic } from './../Expresiones/Arithmetic';
 import { Return } from './Return';
 import { Exceptionn } from '../utilidad/Exceptionn';
 
@@ -12,6 +13,52 @@ import { Break } from '../Instrucciones/Break';
  * Permite imprimir expresiones en la consola
  */
 export class Case extends Node{
+    codigo3direcciones(tabla: Tabla, tree: Tree) {
+      if(this.SoloExpresion){
+        if(this.expression!==null){
+        tree.codigo3d.push("//********Condicion case*******")
+        let comparacion=new Arithmetic(this.temporal,this.expression,"==",this.line,this.column);
+// comparacion es 1 o 0
+
+      let expresion=comparacion.codigo3direcciones(tabla,tree);
+     // console.log(expresion)
+     this.etiquetaV=tree.getEtiqueta();
+
+    tree.codigo3d.push(`if(1==${expresion})goto L${this.etiquetaV};`);
+     // tree.codigo3d.push(`if(${this.temporal}==${expresion})goto L${this.etiquetaV};`);
+    return false;
+      }else{return true;}
+      }
+      else{
+      tree.codigo3d.push("//********case*******")
+      tree.codigo3d.push(`L${this.etiquetaV}:`);
+let returnvalor:Object=null;
+     if(this.ListaInstrucciones!==null){
+for (let x = 0; x <  this.ListaInstrucciones.length; x++) {
+  const element =  this.ListaInstrucciones[x];
+      let res=element.codigo3direcciones(tabla,tree);
+    // si es break;
+    if(res instanceof Break ){
+
+    tree.codigo3d.push(`goto ${this.etiqueta};`);
+      }
+   else  if(res instanceof Continue ){
+
+
+    tree.codigo3d.push(`goto ${this.etiqueta};`);
+    if(returnvalor===null){returnvalor= res;}
+     }
+     else  if(res instanceof Return ){
+       returnvalor= res;
+    }
+    }
+      }
+return returnvalor;
+
+
+    }
+    return false;
+    }
     Traducir(Tabla: Tabla, tree: Tree) {
 
       if(this.expression!==null){
@@ -20,7 +67,8 @@ export class Case extends Node{
       if(this.ListaInstrucciones!==null){
       this.ListaInstrucciones.forEach(element => {
       element.Traducir(Tabla,tree);
-      });}}else{
+      });}
+    }else{
         let data="  default: \n";
         tree.Traduccion.push(data);
         if(this.ListaInstrucciones!==null){
@@ -33,12 +81,20 @@ export class Case extends Node{
     expression : Node;
     ListaInstrucciones:Array<Node>;
     bandera:boolean;
-
+    temporal:Node;
+    etiqueta:string;
+    SoloExpresion:boolean;
+    etiquetaV:number;
+    etiquetaFinal:string;
+    valorSalida:object
     constructor(expression: Node, ListaInstrucciones:Array<Node>,line: number, column: number){
         super(null, line, column);
         this.expression = expression;
         this.ListaInstrucciones=ListaInstrucciones;
-        this.bandera = false;
+        this.SoloExpresion=this.bandera = false;
+        this.etiqueta=null;
+        this.etiquetaV=-1;
+        this.valorSalida=null;
 
     }
 

@@ -9,6 +9,28 @@ import { ɵConsole } from '@angular/core';
  * @class Nodo expresion identificador que obtendra el valor de una variable
  */
 export class Identificador extends Node {
+    codigo3direcciones(tabla: Tabla, tree: Tree) {
+
+      let variable: Simbol;
+      //console.log(this.identifier)
+              variable = tabla.getVariable(this.identifier);
+             // console.log(variable)
+              if (variable == null) {
+                  const error = new Exceptionn('Semantico',
+                      'No se ha encontrado la variable ' + this.identifier,
+                      this.line, this.column);
+                  tree.excepciones.push(error);
+
+                  return error;
+              }
+             let contador=tree.getContador();
+              tree.codigo3d.push(`t${contador}=stack[(int)${variable.value}];`);
+              this.type = variable.type;
+              return "t"+contador;
+
+
+
+    }
     Traducir(tabla: Tabla, tree: Tree) {
     //  console.log(tabla)
      // console.log(this.identifier)

@@ -8,6 +8,7 @@ import { Node } from "../Abstract/Node";
  */
 
 export class Simbol {
+  variable3Direcciones:string;
     type: Type;
     identifier: String
     value: Object
@@ -16,6 +17,10 @@ export class Simbol {
     FuncionListaId:Array<String>;
     FuncionInstrucciones:Array<Node>;
   DemencionesArray:number;
+  temporal:number;
+  temporalreturn:string;
+  cantidadLlamadas:string;
+  //identifier: String
 
     /**
      * @constructor Para crear un nuevo simbolo a utilizar en una tabla de simbolos o funciones
@@ -23,7 +28,9 @@ export class Simbol {
      * @param identifier Nombre de la variable o funcion
      * @param value Valor de la variable u objeto completo de la función
      */
+
     constructor(valorInicial:boolean, type: Type, identifier: String, value: Object) {
+      this.cantidadLlamadas=this.variable3Direcciones="";
         this.type = type;
         this.identifier = identifier;
         this.value = value;
@@ -32,5 +39,10 @@ export class Simbol {
         this.FuncionListaId=new Array();
         this.FuncionInstrucciones=new Array()
         this.DemencionesArray=0;
+        this.temporalreturn="";
     }
+
+    setTemporal(temporal:number){this.temporal=temporal;}
+    getTemporal(){return this.temporal}
 }
+

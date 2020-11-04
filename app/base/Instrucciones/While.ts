@@ -11,6 +11,55 @@ import {types} from "../utilidad/Type";
  * Permite imprimir expresiones en la consola
  */
 export class While extends Node{
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+    let nueva=new Tabla(tabla);
+    tree.pila.push(new Type (types.CICLO));
+    tree.codigo3d.push("// *****while*****")
+    let etiquetaWhile=tree.getEtiqueta();
+    tree.codigo3d.push(`L${etiquetaWhile}:`)
+    let exprecion=this.exprecion.codigo3direcciones(nueva,tree);
+    let etiquetaV=tree.getEtiqueta();
+    let etiquetaF=tree.getEtiqueta();
+    let valorsalida:object=null
+    tree.codigo3d.push(`if(${exprecion}==1) goto L${etiquetaV};`)
+    tree.codigo3d.push(`goto L${etiquetaF};`)
+    tree.etiquetasS.push("L"+etiquetaF);
+    tree.codigo3d.push(`L${etiquetaV}:`)
+if(this.Instruciones!=null)
+{
+  for (let x = 0; x < this.Instruciones.length; x++) {
+    let element = this.Instruciones[x];
+       let res=element.codigo3direcciones(nueva,tree);
+   if(res instanceof Break)
+    {
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+    }
+     else if(res instanceof Continue)
+    {
+
+      tree.codigo3d.push(`goto L${etiquetaWhile};`)
+    }
+    else if(res instanceof Return)
+    {
+      valorsalida=res;
+      tree.codigo3d.push(`goto L${etiquetaWhile};`)
+     // tree.codigo3d.push(`L${etiquetaF}:`)
+     // tree.pila.pop();
+   //  return res
+    }
+
+  }
+}
+
+    // hay que hacer el incremento
+    //this.Incremento.codigo3direcciones(nueva,tree);
+    tree.codigo3d.push(`goto L${etiquetaWhile};`)
+    tree.codigo3d.push(`L${etiquetaF}:`)
+    tree.pila.pop();
+    tree.etiquetasS.pop();
+    return valorsalida;
+  }
+
 Traducir(tabla: Tabla, tree: Tree) {
 let data="while("+this.exprecion.Traducir(tabla,tree)+"){";
 tree.Traduccion.push(data);

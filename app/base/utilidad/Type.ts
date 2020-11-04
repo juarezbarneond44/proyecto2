@@ -35,7 +35,7 @@ export class Type{
         this.type = type;
         this.typeObjeto=null;
         this.typeArray=null;
-        this.  nombre="";
+        this.nombre="";
     }
 
 

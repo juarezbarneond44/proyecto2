@@ -9,13 +9,78 @@ import {types} from "../utilidad/Type";
 import{Case} from "../Instrucciones/Case";
 import { Continue } from "../Instrucciones/Continue";
 import { Break } from '../Instrucciones/Break';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 
 /**
  * Permite imprimir expresiones en la consola
  */
 export class Switch extends Node{
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+    tree.pila.push(new Type (types.SWITCH));
+    tree.codigo3d.push("//********Switch*******")
+    //let expresion=this.expression.codigo3direcciones(tabla,tree);
+    let nueva=new Tabla(tabla)
+    let etiqueta=tree.getEtiqueta();
+    let dato:any=false;
+    this.ListaInstrucciones.forEach(element => {
+      if(element instanceof Case)
+      {
+        element.SoloExpresion=true;
+        element.temporal=this.expression;
+        element.etiqueta="L"+etiqueta;
+      }
+      dato= element.codigo3direcciones(nueva,tree);
+      if(dato instanceof Continue){return dato}
+       if(dato){
+        tree.codigo3d.push("//********Condicon Default*******")
+        let val=tree.getEtiqueta();
+        tree.codigo3d.push(`goto L${val};`);
+        element.etiquetaV=val;
+      }
+    });
+
+
+    let valorSalida:string="";
+    let valorReturnInicial:object=null;
+    this.ListaInstrucciones.forEach(element => {
+      if(element instanceof Case)
+      {
+        element.SoloExpresion=false;
+        element.temporal=this.expression;
+        element.etiqueta="L"+etiqueta;
+      }
+     let res= element.codigo3direcciones(nueva,tree);
+     if (res instanceof Return)
+     {
+      //tree.codigo3d.push(`//return del swhit*******************`);
+    //  console.log("holaaaaaaaaaa  "+valorSalida+"  "+res.temporal)
+       if(valorSalida===""){
+         valorSalida=res.temporal;
+         valorReturnInicial=res;
+         let valor=tree.etiquetasS.pop();tree.etiquetasS.push(valor);
+         tree.codigo3d.push(`goto ${valor};`);
+
+        }
+      else{
+         //tree.codigo3d.push(`${valorSalida}=${res.temporal};`);
+           let valor=tree.etiquetasS.pop();tree.etiquetasS.push(valor);
+           tree.codigo3d.push(`goto ${valor};`);}
+
+     }
+    });
+
+
+
+
+    tree.codigo3d.push("L"+etiqueta+":");
+    tree.pila.pop();
+    return valorReturnInicial;
+  }
+
+
+
+
+
   Traducir(tabla: Tabla, tree: Tree) {
   let data="switch ("+this.expression.Traducir(tabla,tree)+"){";
   tree.Traduccion.push(data);
@@ -31,6 +96,7 @@ return null;
     expression : Node;
     ListaInstrucciones:Array<Case>;
     default:Case;
+
     constructor(expression: Node, ListaInstrucciones:Array<Case>,line: number, column: number){
         super(null, line, column);
         this.expression = expression;

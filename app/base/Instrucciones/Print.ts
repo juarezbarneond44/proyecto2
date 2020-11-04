@@ -1,3 +1,5 @@
+import { Arithmetic } from './../Expresiones/Arithmetic';
+import { Primitive } from './../Expresiones/Primitive';
 import { DeclararArray } from './DeclararArray';
 import { StringEspecial } from './../Expresiones/StringEspecial';
 import { Exceptionn } from './../utilidad/Exceptionn';
@@ -8,10 +10,136 @@ import {Node} from "../Abstract/Node";
 import {Tree} from "../Simbols/Tree";
 import {Type} from "../utilidad/Type";
 import {types} from "../utilidad/Type";
+import { NULL_EXPR } from '@angular/compiler/src/output/output_ast';
 /**
  * Permite imprimir expresiones en la consola
  */
 export class Print extends Node{
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+    let data="";
+    console.log(tabla)
+    if(this.expression!==null){
+
+      if(this.expression.length===1)
+      {  tree.codigo3d.push("//***print****")
+
+        data=this.expression[0].codigo3direcciones(tabla,tree);
+        if(this.expression[0].type===null){return null}
+        if(this.expression[0].type.type==types.STRING)
+        {
+          tree.codigo3d.push("t0="+data+";");
+          tree.codigo3d.push("imprimirString();");
+          tree.codigo3d.push("printf(\"%c\",10);");
+        return null
+
+
+            if(this.expression[0] instanceof Primitive)
+              {
+
+
+               // let aux:string=this.expression[0].codigo3direcciones(tabla,tree);
+               let aux:string=""+data;
+                for (const iterator of aux)
+                 {
+                   tree.codigo3d.push("//agregamos el string al heap");
+                   tree.codigo3d.push("t0=p;");
+
+                   tree.codigo3d.push("t1="+iterator.charCodeAt(0)+";");
+                   tree.codigo3d.push("guardarString();");
+                 }
+                 tree.codigo3d.push("t0=p;");
+                 tree.codigo3d.push("t1=-1;");
+                 tree.codigo3d.push("guardarString();");
+                 //tree.codigo3d.push("t0=p-"+data.length+";");
+                 //tree.codigo3d.push("imprimirString();");
+                 const contador=tree.getContador();
+                 tree.codigo3d.push("t"+contador+"=p-"+(aux.length+1)+";");
+                 data= "t"+contador;
+                // tree.codigo3d.push("printf(\"%c\",10);");
+
+            }
+            else if (this.expression[0] instanceof Arithmetic)
+            {
+              tree.codigo3d.push("t0="+data+";");
+              tree.codigo3d.push("imprimirString();");
+              tree.codigo3d.push("printf(\"%c\",10);");
+            return null
+            }
+
+              tree.codigo3d.push("t0="+data+";");
+              tree.codigo3d.push("imprimirString();");
+              tree.codigo3d.push("printf(\"%c\",10);");
+
+            // variable
+        }
+       else if(this.expression[0].type.type==types.NUMERIC)
+       {
+
+          let etiqueta=tree.getContador();
+        tree.codigo3d.push(`t${etiqueta}=p;`);
+        tree.codigo3d.push(`t2=${data};`);
+        tree.codigo3d.push(`NumberToString();`);
+        tree.codigo3d.push("t0=p;");
+        tree.codigo3d.push("t1=-1;");
+        tree.codigo3d.push("guardarString();");
+        tree.codigo3d.push(`t0=t${etiqueta};`);
+        tree.codigo3d.push("imprimirString();");
+        tree.codigo3d.push(`printf("%c",10);`);
+
+
+
+
+       }
+       else if(this.expression[0].type.type==types.BOOLEAN)
+       {
+        let etiquetaV=tree.getEtiqueta();
+        let etiquetaF=tree.getEtiqueta();
+        let etiquetaS=tree.getEtiqueta();
+       tree.codigo3d.push(`if(${data}==1) goto L${etiquetaV};`);
+       tree.codigo3d.push(`goto L${etiquetaF};`);
+       tree.codigo3d.push(`L${etiquetaV}:`);
+       tree.codigo3d.push("printf(\"%c\",116);");
+       tree.codigo3d.push("printf(\"%c\",114);");
+       tree.codigo3d.push("printf(\"%c\",117);");
+       tree.codigo3d.push("printf(\"%c\",101);");
+       tree.codigo3d.push(`goto L${etiquetaS};`);
+       tree.codigo3d.push(`L${etiquetaF}:`);
+       tree.codigo3d.push("printf(\"%c\",102);");
+       tree.codigo3d.push("printf(\"%c\",97);");
+       tree.codigo3d.push("printf(\"%c\",108);");
+       tree.codigo3d.push("printf(\"%c\",115);");
+       tree.codigo3d.push("printf(\"%c\",101);");
+       tree.codigo3d.push(`L${etiquetaS}:`);
+       tree.codigo3d.push("printf(\"%c\",10);");
+       }else
+       {
+
+       }
+
+
+
+      }else
+      {
+        for (let x =this.expression.length-1; x >-1; x--) {
+         let val=this.expression[x];
+         // if(x-1>-1){data=data+",";}
+         let aux=new  Print([val],this.line,this.column).codigo3direcciones(tabla,tree);
+           tree.codigo3d.pop();
+           //tree.codigo3d.push("printf(\"%c\",44);");
+           tree.codigo3d.push("printf(\"%c\",32);");
+
+        }
+        tree.codigo3d.push("printf(\"%c\",10);");
+
+       // tree.codigo3d.push("printf(\"%f\","+data+");");
+      }
+
+
+
+    }
+
+
+  }
   Traducir(Tabla: Tabla, tree: Tree) {
    let data="";
    if(this.expression!==null){

@@ -1,3 +1,6 @@
+import { Identificador } from './Identificador';
+import { FuncionEjecutar } from './FuncionEjecutar';
+import { Primitive } from './Primitive';
 
 import { Node } from "../Abstract/Node";
 import { Tabla } from "../Simbols/Tabla";
@@ -9,6 +12,521 @@ import { types, Type } from "../utilidad/Type";
  * @class Genera un nuevo nodo expresion para realizar operaciones aritmeticas
  */
 export class Arithmetic extends Node {
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+    try{
+    let izquierdo="";
+    let derecho="";
+    let data="";
+    //if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+    //if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+    if(this.leftOperator instanceof FuncionEjecutar||this.rightOperator instanceof FuncionEjecutar)
+    {
+      if (this.rightOperator instanceof FuncionEjecutar)
+      {
+
+        if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+        if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+      }
+      else if (this.leftOperator instanceof FuncionEjecutar)
+      {
+        if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+        if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+      }
+
+    }else
+    {
+       if(this.leftOperator!==null){izquierdo=this.leftOperator.codigo3direcciones(Tabla,tree);}
+    if(this.rightOperator!==null){derecho=this.rightOperator.codigo3direcciones(Tabla,tree);}
+    }
+
+
+
+
+    if(this.Operator==="+"){
+
+      if((this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.BOOLEAN)&&(this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.BOOLEAN))
+      {   tree.codigo3d.push("// suma de operadores");
+        const contador=tree.getContador();
+        data="t"+contador+"="+ izquierdo+this.Operator+derecho+";";
+        tree.codigo3d.push(data);
+        this.type=new Type(types.NUMERIC);
+        return "t"+contador;
+      }
+      else if(this.leftOperator.type.type===types.STRING||this.rightOperator.type.type===types.STRING)
+      { this.type=new Type(types.STRING);
+        tree.codigo3d.push("// suma de operadores");
+
+        let contador1=tree.getContador();
+          if(this.leftOperator.type.type==types.STRING)
+          {
+
+            tree.codigo3d.push("t"+contador1+"=p;"); // guardara el inicio de la cadena
+            tree.codigo3d.push("t0="+izquierdo+";");  //cargamos lavieja cadena
+            tree.codigo3d.push("concatenarString();"); //realizamos la accion
+          }
+          else if(this.leftOperator.type.type==types.NUMERIC)
+          {
+            tree.codigo3d.push("t"+contador1+"=p;"); // guardara el inicio de la cadena
+            tree.codigo3d.push("t2="+izquierdo+";");
+            tree.codigo3d.push("NumberToString();");
+
+          }
+          else if (this.leftOperator.type.type==types.BOOLEAN)
+          {
+            //hacer uno pa booleanos :,v
+
+            tree.codigo3d.push("t"+contador1+"=p;"); // guardara el inicio de la cadena
+            tree.codigo3d.push("t2="+izquierdo+";");  //cargamos lavieja cadena
+            tree.codigo3d.push("BooleanToString();"); //realizamos la accion
+
+
+          }
+          // la derecha
+          if(this.rightOperator.type.type==types.STRING)
+          {
+            tree.codigo3d.push("t0="+derecho+";");  //cargamos lavieja cadena
+            tree.codigo3d.push("concatenarString();"); //realizamos la accion
+
+          }
+          else if(this.rightOperator.type.type==types.NUMERIC)
+          {
+
+            tree.codigo3d.push("t2="+derecho+";");
+            tree.codigo3d.push("NumberToString();");
+
+          }
+          else if (this.rightOperator.type.type==types.BOOLEAN)
+          {
+            tree.codigo3d.push("t2="+derecho+";");  //cargamos lavieja cadena
+            tree.codigo3d.push("BooleanToString();"); //realizamos la accion
+          }
+          tree.codigo3d.push("t0=p;");
+          tree.codigo3d.push("t1=-1;");
+       tree.codigo3d.push("guardarString();");
+        return "t"+contador1;
+      }
+      else{
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+          }
+    }
+    else if(this.Operator==="-")
+    {
+      if(this.rightOperator===null)
+      {
+        const contador=tree.getContador();
+        tree.codigo3d.push(`//negacion -`);
+        data="t"+contador+"="+ this.Operator+izquierdo+";";
+        tree.codigo3d.push(data);
+        this.type=new Type(types.NUMERIC);
+        return "t"+contador;
+
+      }
+      else if((this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.BOOLEAN)&&(this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.BOOLEAN))
+      {
+        const contador=tree.getContador();
+        tree.codigo3d.push(`//resta -`);
+        data="t"+contador+"="+ izquierdo+this.Operator+derecho+";";
+        tree.codigo3d.push(data);
+        this.type=new Type(types.NUMERIC);
+        return "t"+contador;
+      }
+      else{
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+          }
+    }
+    else if(this.Operator==="*")
+    {
+     // console.log(this)
+      if(this.leftOperator.type.type===types.NUMERIC&&this.rightOperator.type.type===types.NUMERIC)
+      {
+
+
+
+
+        const contador=tree.getContador();
+        tree.codigo3d.push(`//multiplicacion *`);
+        data="t"+contador+"="+ izquierdo+this.Operator+derecho+";";
+        tree.codigo3d.push(data);
+        this.type=new Type(types.NUMERIC);
+        return "t"+contador;
+      }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+
+    }
+    else if(this.Operator==="/")
+    {
+      if(this.leftOperator.type.type===types.NUMERIC&&this.rightOperator.type.type===types.NUMERIC)
+      {
+        const contador=tree.getContador();
+        tree.codigo3d.push(`//division /`);
+        data="t"+contador+"="+ izquierdo+this.Operator+derecho+";";
+        tree.codigo3d.push(data);
+        this.type=new Type(types.NUMERIC);
+        return "t"+contador;
+      }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+
+    }
+    else if(this.Operator==="**")
+    {
+      if(this.leftOperator.type.type===types.NUMERIC&&this.rightOperator.type.type===types.NUMERIC)
+      {
+        const contador=tree.getContador();
+        tree.codigo3d.push(`//POTENCIA **`);
+        tree.codigo3d.push(`t0=${izquierdo}; \nt1=${derecho};\nt2=1; \npotencia();\nt${contador}=t2;`);
+        this.type=new Type(types.NUMERIC);
+        return "t"+contador;
+      }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+    }
+    else if(this.Operator==="%")
+    {
+      if(this.leftOperator.type.type===types.NUMERIC&&this.rightOperator.type.type===types.NUMERIC)
+      {
+        const contador=tree.getContador();
+        tree.codigo3d.push(`//comparar %`);
+        tree.codigo3d.push("t"+contador+`=fmod(${izquierdo},${derecho});`);
+        this.type=new Type(types.NUMERIC);
+        return "t"+contador;
+      }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+    }
+    else if(this.Operator==="||")
+    {
+      if(this.leftOperator.type.type===types.BOOLEAN&&this.rightOperator.type.type===types.BOOLEAN)
+      {
+
+       let valor;
+       tree.codigo3d.push(`//comparar ||`);
+       tree.codigo3d.push(`if(${izquierdo}||${derecho})goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.getContador()}=1;`);
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.contador-1}=0;`);
+       tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+       this.type=new Type(types.BOOLEAN);
+        return "t"+(tree.contador-1);
+      }else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+    }
+    else if(this.Operator==="&&")
+    {
+      if(this.leftOperator.type.type===types.BOOLEAN&&this.rightOperator.type.type===types.BOOLEAN)
+      {
+
+       let valor;
+       tree.codigo3d.push(`//comparar &&`);
+       tree.codigo3d.push(`if(${izquierdo}&&${derecho})goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.getContador()}=1;`);
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.contador-1}=0;`);
+       tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+       this.type=new Type(types.BOOLEAN);
+        return "t"+(tree.contador-1);
+      }else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+    }
+    else if(this.Operator==="==")
+    {
+      if((this.leftOperator.type.type===types.BOOLEAN||this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.STRING)
+      &&(this.rightOperator.type.type===types.BOOLEAN||this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.STRING))
+      {
+
+          // aqui va a ir el string
+
+       let valor;
+       tree.codigo3d.push(`//comparar ==`);
+       if(this.leftOperator.type.type===types.STRING&&this.rightOperator.type.type===types.STRING)
+       {
+        tree.codigo3d.push(`t0=${izquierdo};`);
+        tree.codigo3d.push(`t1=${derecho};`);
+        tree.codigo3d.push(`compararString();`);
+        tree.codigo3d.push(`if(1==t4)goto L${tree.getEtiqueta()};`);
+       }
+       else
+       {
+        tree.codigo3d.push(`if(${izquierdo}==${derecho})goto L${tree.getEtiqueta()};`);
+       }
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.getContador()}=1;`);
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.contador-1}=0;`);
+       tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+       this.type=new Type(types.BOOLEAN);
+        return "t"+(tree.contador-1);
+      }else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+    }
+    else if(this.Operator===">")
+    {
+      if((this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.BOOLEAN)&&(this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.BOOLEAN))
+      {
+
+
+        {
+        let valor;
+        tree.codigo3d.push(`if(${izquierdo}>${derecho})goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.getContador()}=1;`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.contador-1}=0;`);
+        tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+        this.type=new Type(types.BOOLEAN);
+
+         return "t"+(tree.contador-1);
+
+      }
+    }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+
+
+    }
+    else if(this.Operator==="<")
+    {
+      //comparar <
+      if((this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.BOOLEAN)&&(this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.BOOLEAN))
+      {
+
+
+        {
+        let valor;
+        tree.codigo3d.push(`//comparar <`);
+        tree.codigo3d.push(`if(${izquierdo}<${derecho})goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.getContador()}=1;`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.contador-1}=0;`);
+        tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+        this.type=new Type(types.BOOLEAN);
+
+         return "t"+(tree.contador-1);
+
+      }
+    }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+
+
+    }
+    else if(this.Operator===">=")
+    {
+      if((this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.BOOLEAN)&&(this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.BOOLEAN))
+      {
+
+
+        {
+        let valor;
+        tree.codigo3d.push(`//comparar >=`);
+        tree.codigo3d.push(`if(${izquierdo}>=${derecho})goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.getContador()}=1;`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.contador-1}=0;`);
+        tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+        this.type=new Type(types.BOOLEAN);
+
+         return "t"+(tree.contador-1);
+
+      }
+    }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+
+
+    }
+    else if(this.Operator==="<=")
+    {
+      if((this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.BOOLEAN)&&(this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.BOOLEAN))
+      {
+
+
+        {
+        let valor;
+        tree.codigo3d.push(`//comparar <=`);
+        tree.codigo3d.push(`if(${izquierdo}<=${derecho})goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.getContador()}=1;`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.contador-1}=0;`);
+        tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+        this.type=new Type(types.BOOLEAN);
+
+         return "t"+(tree.contador-1);
+
+      }
+    }
+      else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+
+
+    }
+    else if(this.Operator==="!=")
+    {
+      if((this.leftOperator.type.type===types.BOOLEAN||this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.STRING)
+      &&(this.rightOperator.type.type===types.BOOLEAN||this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.STRING))
+      {
+
+       let valor;
+       tree.codigo3d.push(`//comparar !=`);
+       tree.codigo3d.push(`if(${izquierdo}!=${derecho})goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.getContador()}=1;`);
+       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+       tree.codigo3d.push(`t${tree.contador-1}=0;`);
+       tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+       this.type=new Type(types.BOOLEAN);
+        return "t"+(tree.contador-1);
+      }else
+      {
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+    }
+    else if(this.Operator==="!")
+    {
+      if(this.leftOperator.type.type===types.BOOLEAN)
+      {
+      let valor;
+      tree.codigo3d.push(`//comparar !`);
+      tree.codigo3d.push(`if(!${izquierdo})goto L${tree.getEtiqueta()};`);
+      tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+      tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+      tree.codigo3d.push(`t${tree.getContador()}=1;`);
+      tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+      tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+      tree.codigo3d.push(`t${tree.contador-1}=0;`);
+      tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+      this.type=new Type(types.BOOLEAN);
+
+       return "t"+(tree.contador-1);
+      }
+      else{
+        const error = new Exceptionn('Semantico',
+        `Error de tipos en el diferente ${this.leftOperator.type.toString()} y ${this.rightOperator.type.toString()}`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        // tree.console.push(error.toString());
+        this.type = new Type(types.ERROR);return "error";
+      }
+    }
+
+return "error";
+
+  }catch(error){this.type = new Type(types.ERROR);return "error";}
+  }
   Traducir(Tabla: Tabla, tree: Tree) {
 let izquierdo="";
 let derecho="";

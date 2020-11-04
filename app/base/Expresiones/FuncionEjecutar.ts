@@ -1,3 +1,5 @@
+import { Primitive } from './Primitive';
+import { Arithmetic } from './Arithmetic';
 import { Identificador } from './Identificador';
 import { ArregloValor } from './ArregloValor';
 import { Declaracion } from './../Instrucciones/Declaracion';
@@ -15,6 +17,160 @@ import { Exceptionn } from "../utilidad/Exceptionn";
  * @class Nodo expresion identificador que obtendra el valor de una variable
  */
 export class FuncionEjecutar extends Node {
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+
+    let res=tabla.getVariable(this.id); // se busca el nombre de la funcion
+    if(res===null)
+    {
+      const error = new Exceptionn('Semantico',`Funcion no existe `+this.id,this.line, this.column);tree.excepciones.push(error);
+      return "error"
+    }
+
+    // lista de expresiones
+    if(this.ListaExpreciones.length!==res.FuncionListaId.length) // si no tienen el mismo tamaño marcar error
+    {
+      const error = new Exceptionn('Semantico',`la llamada de funcion no tiene la misma cantidad de parametros funcion:`+this.id,this.line, this.column);tree.excepciones.push(error);
+      return "error"
+    }
+
+      //este for es para recorer las expreciones de la llamada y si viene una llamada dentro de eso traducirla (ackerman)
+    for (let x = 0; x < this.ListaExpreciones.length; x++) {
+      const element = this.ListaExpreciones[x];
+      //dato es el valor de cada variable
+        if(tabla.Previous!==null)
+        {
+          if(element instanceof FuncionEjecutar)
+          {
+            element.codigo3direcciones(tabla,tree)
+          }
+        }
+  }
+  // esto es para el ackerman
+
+  //empieza la llamada de funcion
+  tree.codigo3d.push(`//*********llamada de funcion ${this.id}***********`);
+  if(tabla.Previous===null)  // si la llamada esta en el main
+  {
+  tree.codigo3d.push(`${res.cantidadLlamadas}=10000;`);
+  }else  if(tabla.Previous!==null)
+  {
+     tree.codigo3d.push(`//-------------------guardar el return en el stack-------------------- `);
+    if(tree.etiquetaReturn.length>0)
+    {
+      let temp=tree.etiquetaReturn.pop();
+      tree.etiquetaReturn.push(temp);
+      tree.codigo3d.push(`stack[(int)${res.cantidadLlamadas}]=${temp};`)
+
+      tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}+1;`)
+    }
+  if(res.type.type!==types.VOID){
+    tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}+1;`);
+  }
+
+  }
+  // en este for se guardaran los valores de la llamada al stack
+  for (let x = 0; x < this.ListaExpreciones.length; x++) {
+    const element = this.ListaExpreciones[x];
+    const idvariable=res.FuncionListaId[x];
+    let dato=res.entornoFuncion.getVariable(idvariable);
+      if(tabla.Previous!==null)
+      {
+       let aux=tree.getContador();
+       tree.codigo3d.push(`//variable ->${dato.identifier}`);
+        tree.codigo3d.push(`t${aux}=stack[(int)${dato.value}];`);
+        tree.codigo3d.push(`stack[(int)${res.cantidadLlamadas}]=t${aux};`);
+        tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}+1;`);
+      }
+      if(element instanceof FuncionEjecutar)
+      {
+        tree.codigo3d.push(`t${dato.temporal}=${element.datojuan};`);
+      }else{
+      let valor=element.codigo3direcciones(tabla,tree);
+      tree.codigo3d.push(`t${dato.temporal}=${valor};`);
+      }
+}
+
+tree.codigo3d.push(`${res.identifier}();`);
+//en esta parte se va a retornar el valor del return si es que hay y el valor de las variables
+
+if(res.type.type!==types.VOID)
+{
+   this.type=res.type;
+   let valorReturn="t"+tree.getContador();
+   if(tabla.Previous!==null)
+   {
+    tree.codigo3d.push(`${valorReturn}=stack[(int)${res.cantidadLlamadas}];`);
+    tree.codigo3d.push("//*******obtencion de las variables*******");
+    for (let x = res.FuncionListaId.length-1; x > -1; x--) {
+      const element = res.FuncionListaId[x];
+      let valorVariable=res.entornoFuncion.getVariable(element);
+      //obtenemos el puntero de cada variable
+      tree.codigo3d.push(`//obtener variable ->${valorVariable.identifier}***`);
+      //obtener el valor de la pila
+      let aux="t"+tree.getContador();//sera el valor de la pila
+      tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`);
+      tree.codigo3d.push(`${aux}=stack[(int)${res.cantidadLlamadas}];`);
+      tree.codigo3d.push(`stack[(int)${valorVariable.value}]=${aux};`);
+     }
+
+     tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`);
+   }
+   // aqui obtendremos el valor del return
+   let valor="t"+tree.getContador();
+   tree.codigo3d.push(`//se obtiene el valor del return`);
+   if(tabla.Previous===null)
+   {
+    tree.codigo3d.push(`${valor}=stack[(int)${res.temporalreturn}];`);
+    return valor;
+   }
+   else{
+    tree.codigo3d.push(`//obtener el valor de la llamada anterior`);
+    if(tree.etiquetaReturn.length>0)
+    {
+      let temp=tree.etiquetaReturn.pop();
+      //tree.etiquetaReturn.push(temp);
+     // let cantidadDatos=1+this.ListaExpreciones.length;
+      tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`)
+      tree.codigo3d.push(`${temp}=stack[(int)${res.cantidadLlamadas}];`)
+
+    }
+    valor=valorReturn;
+    tree.etiquetaReturn.push(valor);
+    this.datojuan=valor;
+    return valor
+  }
+}
+else
+{
+  if(tabla.Previous!==null)
+  {
+   //tree.codigo3d.push(`${valorReturn}=stack[(int)${res.cantidadLlamadas}];`);
+   tree.codigo3d.push("//*******obtencion de las variables*******");
+   for (let x = res.FuncionListaId.length-1; x > -1; x--) {
+     const element = res.FuncionListaId[x];
+     let valorVariable=res.entornoFuncion.getVariable(element);
+     //obtenemos el puntero de cada variable
+     tree.codigo3d.push(`//obtener variable ->${valorVariable.identifier}***`);
+     //obtener el valor de la pila
+     let aux="t"+tree.getContador();//sera el valor de la pila
+     tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`);
+     tree.codigo3d.push(`${aux}=stack[(int)${res.cantidadLlamadas}];`);
+     tree.codigo3d.push(`stack[(int)${valorVariable.value}]=${aux};`);
+
+    }
+
+  }
+
+
+
+
+
+}
+
+
+
+
+  }
   Traducir(tabla: Tabla, tree: Tree) {
     //console.log(this);
     let info="";
@@ -71,6 +227,7 @@ tipo:boolean;
 valor:Object;
 datojuan:any;
 anidada:boolean
+listaDeValoresReturn:Array<string>;
 constructor(tipo:boolean,id:string,ListaExpreciones:Array<Node>,line:number,Column:number){
   super(null,line,Column);
   this.id=id;

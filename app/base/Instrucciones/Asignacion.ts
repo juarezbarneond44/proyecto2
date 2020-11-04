@@ -1,3 +1,4 @@
+
 import { ArregloValor } from './../Expresiones/ArregloValor';
 
 import { IdentificadorExprecion } from './IdentificadorExprecion';
@@ -9,11 +10,57 @@ import {Node} from "../Abstract/Node";
 import { Tabla } from "../Simbols/Tabla";
 import { Tree } from "../Simbols/Tree";
 import { Exceptionn } from '../utilidad/Exceptionn';
-import { info } from 'console';
-import { of } from 'rxjs';
+
 
 
 export class Asignacion extends Node {
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+
+    const resultado=tabla.getVariable(this.idenfiticador);
+    if(resultado==null)
+    {
+      const error = new Exceptionn('Semantico',
+      `No exite id ${this.idenfiticador}`,
+      this.line, this.column);
+      tree.excepciones.push(error);
+      return "error";
+    }
+    if(!resultado.valorInicial)
+    {
+      if(resultado.type.type==types.ANY){}
+      else {
+        const error = new Exceptionn('Semantico',
+        `No se puede Asignar a una constante`,
+        this.line, this.column);
+        tree.excepciones.push(error);
+        return "error"
+      }
+    }
+    let valor =this.exprecion.codigo3direcciones(tabla,tree);
+    if(resultado.type.type==types.ANY)
+    {
+      resultado.type=this.exprecion.type;
+      tree.codigo3d.push(`//asignacion`);
+      tree.codigo3d.push(`stack[(int)${resultado.value}]=${valor};`);
+      return null;
+    }
+    else if(resultado.type.type==this.exprecion.type.type)
+    {
+
+      tree.codigo3d.push(`//asignacion`);
+      tree.codigo3d.push(`stack[(int)${resultado.value}]=${valor};`);
+      return null;
+    }
+    else{
+      const error = new Exceptionn('Semantico',
+      `tipos no validos ${resultado.type.toString()} y ${this.exprecion.type.toString()}`,
+      this.line, this.column);
+      tree.excepciones.push(error);
+      return "error";
+    }
+
+
+  }
   Traducir(tabla: Tabla, tree: Tree) {
     let data="";
     let aux=tabla;
@@ -99,10 +146,8 @@ execute(table: Tabla, tree: Tree) {
   try{
 
   // si es nulo puede ser un type o un array
-
   if(this.exprecion==null){
-
-    const info1=table.getVariable(this.idenfiticador);
+  const info1=table.getVariable(this.idenfiticador);
 if (info1==null)
 {
   const error = new Exceptionn('Semantico',
@@ -123,7 +168,6 @@ if (info1==null)
 
 }
 // aqui empieza l aasignacion
-
 //  g("entra")
 if(this.type.type===types.ARRAY){
 //  g(info1)
@@ -188,8 +232,6 @@ if(this.type.type===types.ARRAY){
 
   return null;
 }
-
-
 const resultado=table.getVariable(info1.type.nombre);
 if(resultado==null){
   return null;
@@ -248,14 +290,9 @@ tree.excepciones.push(error);
 return error;
 
 }
-
-
 return null;
 }
-
 // esto es la parte izi
-
-
   const result = this.exprecion.execute(table, tree);
   if(result==null){   const error = new Exceptionn('Semantico',
   `No se puede Asignar un valor Nulo`,

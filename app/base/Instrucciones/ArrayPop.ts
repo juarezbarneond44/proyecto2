@@ -8,6 +8,9 @@ import {Tree} from "../Simbols/Tree";
 import {Type, types} from "../utilidad/Type";
 
 export class ArrayPop extends Node{
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+    throw new Error('Method not implemented.');
+  }
   Traducir(tabla: Tabla, tree: Tree) {
     let data=this.id;
     let aux=tabla;

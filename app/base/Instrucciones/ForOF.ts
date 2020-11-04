@@ -16,6 +16,9 @@ import {types} from "../utilidad/Type";
  * Permite imprimir expresiones en la consola
  */
 export class ForOF extends Node{
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+    throw new Error('Method not implemented.');
+  }
   Traducir(tabla: Tabla, tree: Tree) {
     let data = 'for(';
     let newTabl2a=new Tabla (tabla);

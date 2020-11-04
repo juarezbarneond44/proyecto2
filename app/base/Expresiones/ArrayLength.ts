@@ -13,6 +13,9 @@ import {Type, types} from "../utilidad/Type";
  * por ejemplo numeros, booleanos o cadenas(suponiendo que la cadena es primitivo)
  */
 export class ArrayLength extends Node{
+    codigo3direcciones(Tabla: Tabla, tree: Tree) {
+      throw new Error('Method not implemented.');
+    }
     Traducir(tabla: Tabla, tree: Tree) {
       let data="";
       let aux=tabla;

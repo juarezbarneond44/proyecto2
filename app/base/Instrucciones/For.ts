@@ -13,6 +13,57 @@ import { trace } from 'console';
  * Permite imprimir expresiones en la consola
  */
 export class For extends Node{
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+    tree.pila.push(new Type (types.CICLO));
+    let valorsalida:object=null
+    let nueva=new Tabla(tabla);
+    tree.codigo3d.push("// *****for*****")
+    let etiquetaFor=tree.getEtiqueta();
+     this.Instruccion.codigo3direcciones(nueva,tree);
+     tree.codigo3d.push(`L${etiquetaFor}:`)
+    let exprecion=this.Exprecion.codigo3direcciones(nueva,tree);
+
+    let etiquetaV=tree.getEtiqueta();
+    let etiquetaF=tree.getEtiqueta();
+    tree.etiquetasS.push("L"+etiquetaF);
+
+    tree.codigo3d.push(`if(${exprecion}==1) goto L${etiquetaV};`)
+    tree.codigo3d.push(`goto L${etiquetaF};`)
+
+    tree.codigo3d.push(`L${etiquetaV}:`)
+if(this.Instrucciones!=null)
+{
+  let nueva2=new Tabla(nueva);
+  this.Instrucciones.forEach(element =>
+    {
+    let res=element.codigo3direcciones(nueva2,tree);
+    if(res instanceof Break)
+    {
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+    }
+     else if(res instanceof Continue)
+    {
+      this.Incremento.codigo3direcciones(nueva,tree);
+      tree.codigo3d.push(`goto L${etiquetaFor};`)
+    }
+    else if(res instanceof Return)
+    {
+      if(valorsalida===null){valorsalida= res;   tree.codigo3d.push(`goto L${etiquetaF};`)}
+
+
+    }
+  });
+}
+    // hay que hacer el incremento
+    this.Incremento.codigo3direcciones(nueva,tree);
+    tree.codigo3d.push(`goto L${etiquetaFor};`)
+    tree.codigo3d.push(`L${etiquetaF}:`)
+    tree.etiquetasS.pop();
+    tree.pila.pop();
+    return valorsalida;
+  }
+
+
   Traducir(tabla: Tabla, tree: Tree) {
 
 let data="for(";

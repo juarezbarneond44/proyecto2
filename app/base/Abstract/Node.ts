@@ -13,6 +13,8 @@ export abstract class Node {
      */
     abstract execute(Tabla: Tabla, tree: Tree): any;
     abstract Traducir(Tabla: Tabla, tree: Tree): any;
+    abstract codigo3direcciones(Tabla: Tabla, tree: Tree): any;
+
 
     /**
      *

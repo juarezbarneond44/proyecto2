@@ -15,6 +15,9 @@ import { of } from 'rxjs';
  * por ejemplo numeros, booleanos o cadenas(suponiendo que la cadena es primitivo)
  */
 export class ArregloValor extends Node{
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+    throw new Error('Method not implemented.');
+  }
     Traducir(tabla: Tabla, tree: Tree) {
       let data="";
 

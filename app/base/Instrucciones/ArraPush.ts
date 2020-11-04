@@ -9,6 +9,9 @@ import {Tree} from "../Simbols/Tree";
 import {types} from "../utilidad/Type";
 
 export class ArraPush extends Node{
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+    throw new Error('Method not implemented.');
+  }
   Traducir(tabla: Tabla, tree: Tree) {
 let data=this.id;
 if(this.value!==null){

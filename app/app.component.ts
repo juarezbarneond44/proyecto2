@@ -1,3 +1,10 @@
+import { StringConcat } from './base/Expresiones/StringConcat';
+import { StringToUpperCase } from './base/Expresiones/StringToUpperCase';
+import { StringToLowerCase } from './base/Expresiones/StringToLowerCase';
+import { StringCharAt } from './base/Expresiones/StringCharAt';
+import { StringLength } from './base/Expresiones/StringLength';
+
+
 import { DeclararArray } from './base/Instrucciones/DeclararArray';
 import { ArregloValor } from './base/Expresiones/ArregloValor';
 
@@ -35,6 +42,7 @@ import {Print} from "./base/Instrucciones/Print";
 import {Declaracion} from "./base/Instrucciones/Declaracion";
 import {declararLista} from "./base/Instrucciones/declararLista";
 import {GraficarEntorno} from "./base/Instrucciones/GraficarEntorno";
+
 import {ForOF} from "./base/Instrucciones/ForOF";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import{Parentesis}from "./base/Expresiones/Parentesis";
@@ -46,6 +54,7 @@ import {ArrayLength} from './base/Expresiones/ArrayLength';
 import {ArraPush}  from './base/Instrucciones/ArraPush';
 import {ArrayPop}  from './base/Instrucciones/ArrayPop';
 import { type } from 'os';
+import { identifierModuleUrl, Expression } from '@angular/compiler';
 
 const parser = require('./base/Grammar/Grammar.js');
 
@@ -92,70 +101,62 @@ listaErroresEjecucion:Array<Exceptionn>=new Array();
 ejecutarr:boolean=true;
  tabla = new Tabla(null);
   tree:Tree;
-  ejecutar()
-  {
-    this.ejecutarr=true;
-    this.listaErroresEjecucion=new Array();
-    this. tree = parser.parse(this.textoEntrada);
-
-    this.tabla=new Tabla(null);
-    if(this.tree.instructions==null){return;}
-    this.tree.instructions.map((m) => {
-       if(m instanceof TypeDeclaracion){  const res = m.execute(this.tabla, this.tree);}
-      });
-      this.tree.instructions.map((m) => {
-        if(m instanceof Funcion){  const res = m.execute(this.tabla, this.tree);}
-       });
-       this.tree.instructions.map((m) => {
-        if(m instanceof declararLista){  const res = m.execute(this.tabla, this.tree);}
-       });
-    this.tree.instructions.map((m) => {
-        if(!(m instanceof declararLista)&&!(m instanceof Funcion)&&!(m instanceof TypeDeclaracion)){  const res = m.execute(this.tabla, this.tree);}
-       });
-
-
-
-
-
-    this.textoSalida = "";
-    this.tree.console.forEach(element =>
-      {
-    this.textoSalida=this.textoSalida+element+'\n';
-    });
-    this.listaErroresEjecucion=this.tree.excepciones;
-
-console.log(this.listaErroresEjecucion);
-
-
-
-  }
   traducir()
-  {   this.ejecutarr=false;
+  {
+
+
+    this.ejecutarr=false;
       this.listaErroresEjecucion=new Array();
       this. tree = parser.parse(this.textoEntrada);
 
       this.tabla=new Tabla(null);
       if(this.tree.instructions==null){return;}
       this.tree.instructions.map((m) => {
-     const res = m.Traducir(this.tabla, this.tree);
+               if(m instanceof Funcion){ const res = m.codigo3direcciones(this.tabla, this.tree);}
       });
 
+      this.tree.codigo3d.push("void main(){");
+
+      this.tree.instructions.map((m) => {
+        if(!(m instanceof Funcion)){  const res = m.codigo3direcciones(this.tabla, this.tree);}
+       });
+
+
+
       this.textoSalida = "";
-      this.tree.Traduccion.forEach(element =>
+      this.textoSalida=this.textoSalida="#include <stdio.h>\n#include<math.h>\n";
+      // se agregaran todos lo s temporales
+      for (let x = 0; x < this.tree.contador; x++) {
+       if(x==0){this.textoSalida=this.textoSalida+"double "}
+       else if(x%20==0){this.textoSalida=this.textoSalida+"\n"}
+      this.textoSalida=this.textoSalida+"t"+x;
+      if(this.tree.contador-1!==x){this.textoSalida=this.textoSalida+","}
+
+     }
+      if( this.tree.contador!==0){this.textoSalida=this.textoSalida+";\n"}
+// se imprimiran todas las funciones nativas
+
+
+    this.tree.Encabezadocodigo3d.forEach(element => {
+      this.textoSalida=this.textoSalida+element+"\n";});
+      // aqui vendra todo el codigo
+
+      this.tree.codigo3d.forEach(element =>
       {
         if(element===null){}
         else{
-        this.textoSalida=this.textoSalida+element;
-        if(element.charAt(element.length-1)===";") {
-        this.textoSalida=this.textoSalida+'\n'; }
-        else if(element.charAt(element.length-1)==="{") {
-        this.textoSalida=this.textoSalida+'\n'; }
-        else if(element.charAt(element.length-1)==="}") {
-          this.textoSalida=this.textoSalida+'\n'; }
-        }
+
+          this.textoSalida=this.textoSalida+element+'\n'; }
+
     });
+    this.textoSalida=this.textoSalida+"return;\n}";
       this.listaErroresEjecucion=this.tree.excepciones;
       console.log(this.listaErroresEjecucion);
+
+
+  }
+  optimizar()
+  {
 
   }
   limpiarEntrada()
@@ -327,7 +328,82 @@ console.log(this.listaErroresEjecucion);
       });
      // exp.children.push(new Nodo_AST("]",null,[]))
 
+
+
+
+
+
+
+
+
+
+
+
     }
+    if(element instanceof Parentesis){
+      if(element.expresion != null){
+        let izq: Nodo_AST= this.ast(element.expresion);
+        izq.parent = exp;
+        exp.children.push(izq);
+      }
+     //exp.children.push(new Nodo_AST(element,exp,[]));
+    }
+    if(element instanceof StringConcat){
+
+        let izq: Nodo_AST= this.ast(element.expresion);
+        izq.parent = exp;
+        exp.children.push(izq);
+        let op: Nodo_AST= new Nodo_AST("Concat",null,[]);
+        exp.children.push(op);
+        let der: Nodo_AST= this.ast(element.expresion2);
+        der.parent = exp;
+        exp.children.push(der);
+
+    }
+    if(element instanceof StringToUpperCase){
+
+      let izq: Nodo_AST= this.ast(element.expresion);
+      izq.parent = exp;
+      exp.children.push(izq);
+      let op: Nodo_AST= new Nodo_AST("ToUpperCase()",null,[]);
+      exp.children.push(op);
+  }
+  if(element instanceof StringToLowerCase){
+
+    let izq: Nodo_AST= this.ast(element.expresion);
+    izq.parent = exp;
+    exp.children.push(izq);
+    let op: Nodo_AST= new Nodo_AST("ToLowerCase()",null,[]);
+    exp.children.push(op);
+}
+if(element instanceof StringCharAt){
+
+  let izq: Nodo_AST= this.ast(element.Expression1);
+  izq.parent = exp;
+  exp.children.push(izq);
+  let op: Nodo_AST= new Nodo_AST("CharAt",null,[]);
+  exp.children.push(op);
+  let der: Nodo_AST= this.ast(element.Expression2);
+  der.parent = exp;
+  exp.children.push(der);
+}
+if(element instanceof StringLength){
+
+  let izq: Nodo_AST= this.ast(element.expresion);
+  izq.parent = exp;
+  exp.children.push(izq);
+  let op: Nodo_AST= new Nodo_AST("length()",null,[]);
+  exp.children.push(op);
+
+}
+
+
+   // import {   } from './base/Expresiones/StringLength';
+
+
+
+
+
 
     return exp;
   }
@@ -925,7 +1001,7 @@ pdf.add("\n");
         let tabla1=new Table([ [ 'Entorno Global']]).widths([ 537]).alignment('center').end;     pdf.add(tabla1);
       }    else if(booleano) {let tabla1=new Table([ [ 'Entorno Anterior']]).widths([ 537]).alignment('center').end;     pdf.add(tabla1);}
       booleano=true;
-      let tabla=new Table([ [ 'Valor Inicial','Tipo','Identificador','valor']]).widths([ 110, 130 ,150,120]).alignment('center').end;
+      let tabla=new Table([ [ 'Valor Inicial','Tipo','Identificador','puntero stack']]).widths([ 110, 130 ,150,120]).alignment('center').end;
       pdf.add(tabla);
       tablas.Variables.forEach(element => {
         let val1="";
@@ -1027,22 +1103,7 @@ copyInputMessage(){
     this.textoEntrada= this.textoSalida
       alert("Texto Copiado");
   }
-  // Asigna el contenido del elemento especificado al valor del campo
-  //console.log(this.textoSalida)
-  //aux.setAttribute("Value","this.textoSalida");
-  //let aux=   document.getElementById("codemirrorCode2");
-  // Añade el campo a la página
-  //document.body.appendChild(aux);
 
-  // Selecciona el contenido del campo
-//console.log(aux)
-//aux.
-  //inputElement.select();
-  //document.textContent="asd";
-//  document.execCommand('copy');
-  //inputElement.setSelectionRange(0, 0);
-  //document.body.removeChild(aux);
-  //alert("Texto Copiado");
 }
 valorTypes(aux:any)
 {

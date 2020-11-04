@@ -9,6 +9,36 @@ import { Type, types } from '../utilidad/Type';
 
 
 export class declararLista extends Node {
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+
+    for (let i = 0; i < this.ListaDeclaraciones.length; i++) {
+      let res = this.ListaDeclaraciones[i].codigo3direcciones(Tabla, tree);
+
+      // aqui tenemos el smbolo cochino :v
+      if(res instanceof Exceptionn)
+      {continue;
+      }else{
+           if(res===null){
+            const error = new Exceptionn('Semantico',
+            "no se puede declarar un valor error",
+            this.line, this.column);
+        tree.excepciones.push(error);
+        continue;
+           }
+            res.valorInicial=this.tipoInicial;
+            const res2 = Tabla.setVariable(res);
+         //   console.log(Tabla)
+            if (res2 != null) {
+                  const error = new Exceptionn('Semantico',
+                      res2,
+                      this.line, this.column);
+                  tree.excepciones.push(error);
+                //  tree.console.push(error.toString());
+              }}
+            }
+return null;
+
+  }
   Traducir(Tabla: Tabla, tree: Tree) {
    let data="";
 

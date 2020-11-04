@@ -10,6 +10,13 @@ import {Type, types} from "../utilidad/Type";
  * por ejemplo numeros, booleanos o cadenas(suponiendo que la cadena es primitivo)
  */
 export class Parentesis extends Node{
+  codigo3direcciones(Tabla: Tabla, tree: Tree) {
+
+    let data=this.expresion.codigo3direcciones(Tabla,tree)
+    this.type=this.expresion.type;
+    return data;
+
+  }
   expresion:Node;
   constructor(expre:Node,lin:number,col:number){
     super(null,lin,col);
