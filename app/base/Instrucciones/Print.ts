@@ -17,7 +17,7 @@ import { NULL_EXPR } from '@angular/compiler/src/output/output_ast';
 export class Print extends Node{
   codigo3direcciones(tabla: Tabla, tree: Tree) {
     let data="";
-    console.log(tabla)
+   // console.log(tabla)
     if(this.expression!==null){
 
       if(this.expression.length===1)
@@ -111,9 +111,11 @@ export class Print extends Node{
        tree.codigo3d.push("printf(\"%c\",101);");
        tree.codigo3d.push(`L${etiquetaS}:`);
        tree.codigo3d.push("printf(\"%c\",10);");
-       }else
+       }else if(this.expression[0].type.type==types.ARRAY)
        {
-
+         console.log(this.expression[0])
+        tree.codigo3d.push("t0="+data+";");
+        tree.codigo3d.push("PrintArreglo();");
        }
 
 

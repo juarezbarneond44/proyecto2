@@ -73,6 +73,7 @@ export class FuncionEjecutar extends Node {
     const element = this.ListaExpreciones[x];
     const idvariable=res.FuncionListaId[x];
     let dato=res.entornoFuncion.getVariable(idvariable);
+    console.log(dato);
       if(tabla.Previous!==null)
       {
        let aux=tree.getContador();
@@ -128,8 +129,6 @@ if(res.type.type!==types.VOID)
     if(tree.etiquetaReturn.length>0)
     {
       let temp=tree.etiquetaReturn.pop();
-      //tree.etiquetaReturn.push(temp);
-     // let cantidadDatos=1+this.ListaExpreciones.length;
       tree.codigo3d.push(`${res.cantidadLlamadas}=${res.cantidadLlamadas}-1;`)
       tree.codigo3d.push(`${temp}=stack[(int)${res.cantidadLlamadas}];`)
 
@@ -144,7 +143,6 @@ else
 {
   if(tabla.Previous!==null)
   {
-   //tree.codigo3d.push(`${valorReturn}=stack[(int)${res.cantidadLlamadas}];`);
    tree.codigo3d.push("//*******obtencion de las variables*******");
    for (let x = res.FuncionListaId.length-1; x > -1; x--) {
      const element = res.FuncionListaId[x];
