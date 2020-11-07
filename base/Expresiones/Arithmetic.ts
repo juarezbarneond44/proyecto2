@@ -70,11 +70,6 @@ export class Arithmetic extends Node {
             tree.codigo3d.push("t2="+izquierdo+";");
             tree.codigo3d.push("NumberToString();");
 
-            //tree.codigo3d.push("guardarString();");
-            // tree.codigo3d.push("t0=p;");
-          //   if(this.leftOperator.type.type==types.BOOLEAN){   tree.codigo3d.push("t1="+izquierdo+";");}
-           //  else{tree.codigo3d.push("t1="+izquierdo+";");}
-           //  tree.codigo3d.push("guardarString();");
           }
           else if (this.leftOperator.type.type==types.BOOLEAN)
           {
@@ -151,7 +146,7 @@ export class Arithmetic extends Node {
     }
     else if(this.Operator==="*")
     {
-      console.log(this)
+     // console.log(this)
       if(this.leftOperator.type.type===types.NUMERIC&&this.rightOperator.type.type===types.NUMERIC)
       {
 
@@ -294,12 +289,27 @@ export class Arithmetic extends Node {
     }
     else if(this.Operator==="==")
     {
+          if(this.leftOperator.type.type==types.ARRAY&&this.rightOperator.type.type==types.ARRAY)
+      {
+        //console.log("entraaaaaaaaaaaaa")
+        let valor;
+        tree.codigo3d.push(`//comparar arreglos==`);
+        tree.codigo3d.push(`if(${derecho}==${izquierdo})goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.getContador()}=1;`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.contador-1}=0;`);
+        tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+        this.type=new Type(types.BOOLEAN);
+         return "t"+(tree.contador-1);
+      }
       if((this.leftOperator.type.type===types.BOOLEAN||this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.STRING)
       &&(this.rightOperator.type.type===types.BOOLEAN||this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.STRING))
       {
 
           // aqui va a ir el string
-
        let valor;
        tree.codigo3d.push(`//comparar ==`);
        if(this.leftOperator.type.type===types.STRING&&this.rightOperator.type.type===types.STRING)
@@ -474,6 +484,21 @@ export class Arithmetic extends Node {
     }
     else if(this.Operator==="!=")
     {
+      if(this.leftOperator.type.type==types.ARRAY&&this.rightOperator.type.type==types.ARRAY)
+      {
+          let valor;
+        tree.codigo3d.push(`//comparar arreglos==`);
+        tree.codigo3d.push(`if(${derecho}!=${izquierdo})goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.getContador()}=1;`);
+        tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
+        tree.codigo3d.push(`L${tree.etiquetas-2}:`);
+        tree.codigo3d.push(`t${tree.contador-1}=0;`);
+        tree.codigo3d.push(`L${tree.etiquetas-1}:`);
+        this.type=new Type(types.BOOLEAN);
+         return "t"+(tree.contador-1);
+      }
       if((this.leftOperator.type.type===types.BOOLEAN||this.leftOperator.type.type===types.NUMERIC||this.leftOperator.type.type===types.STRING)
       &&(this.rightOperator.type.type===types.BOOLEAN||this.rightOperator.type.type===types.NUMERIC||this.rightOperator.type.type===types.STRING))
       {

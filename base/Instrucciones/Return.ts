@@ -18,10 +18,7 @@ if(this.Exprecion!==null)
 {
   tree.codigo3d.push("//***return***")
   let valor =this.Exprecion.codigo3direcciones(tabla,tree);
-  //let etiquetaReturn=tree.getContador()
-  //tree.codigo3d.push("//----------------------------------------------------------")
     tree.codigo3d.push(`stack[(int)${tree.punteroReturn}]=${valor};`);
-  //this.temporal="t"+etiquetaReturn;
   return this;
 }
 else {return this;}

@@ -43,6 +43,7 @@ import{Parentesis}from "../Expresiones/Parentesis";
 export class StringEspecial extends Node{
   codigo3direcciones(table: Tabla, tree1: Tree)
   {
+    let temporales;
   let data:String=this.value+"";
   let estado=0;
   let valor_imprimir="";
@@ -93,21 +94,41 @@ export class StringEspecial extends Node{
         {
           //console.log(valor_imprimir)
           //console.log(element)
-         let val=new Primitive(new Type(types.STRING),valor_imprimir,this.line,this.column).codigo3direcciones(tabla,tree1);
-          ;
+          let derecha
+
+            if(this.valorString==null)
+            {
+
+              let val=new Primitive(new Type(types.STRING),valor_imprimir,this.line,this.column).codigo3direcciones(tabla,tree1);
+              this.valorString="t"+tree1.getContador();
+               derecha="t"+tree1.getContador();
+
+              tree1.codigo3d.push(this.valorString+"=p;"); // guardara el inicio de la cadena
+              tree1.codigo3d.push("t0="+val+";");  //cargamos lavieja cadena
+              tree1.codigo3d.push("concatenarString();"); //realizamos la accion+
+
+              tree1.codigo3d.push(derecha+"=stack[(int)"+element.value+"];");  //cargamos lavieja cadena
+              //tree1.codigo3d.push("concatenarString();"); //realizamos la accion+
+            }else
+            {
+              let val=new Primitive(new Type(types.STRING),valor_imprimir,this.line,this.column).codigo3direcciones(tabla,tree1);
+              //console.log(valor_imprimir)
+              tree1.codigo3d.push("t0="+this.valorString+";");  //cargamos lavieja cadena
+              this.valorString="t"+tree1.getContador();
+              tree1.codigo3d.push(this.valorString+"=p;"); // guardara el inicio de la cadena
+              tree1.codigo3d.push("concatenarString();"); //realizamos la accion
 
 
-          //tree1.codigo3d.push("//******************************************************************************"); //realizamos la accion
-            let contador=tree1.getContador();
-            let derecha="t"+tree1.getContador();
-            this.valorString="t"+contador;
-            tree1.codigo3d.push("t"+contador+"=p;"); // guardara el inicio de la cadena
-            tree1.codigo3d.push("t0="+val+";");  //cargamos lavieja cadena
-            tree1.codigo3d.push("concatenarString();"); //realizamos la accion+
-         //   console.log(element)
+              tree1.codigo3d.push("t0="+val+";");  //cargamos lavieja cadena
+             tree1.codigo3d.push("concatenarString();"); //realizamos la accion+
 
-            tree1.codigo3d.push(derecha+"=stack[(int)"+element.value+"];");  //cargamos lavieja cadena
-            tree1.codigo3d.push("concatenarString();"); //realizamos la accion+
+              derecha="t"+tree1.getContador();
+              tree1.codigo3d.push(derecha+"=stack[(int)"+element.value+"];");  //cargamos lavieja cadena
+
+
+
+            }
+
             if(element.type.type==types.NUMERIC)
             {
               //console.log("entra aqu")
@@ -128,14 +149,9 @@ export class StringEspecial extends Node{
             tree1.codigo3d.push("t0=p;");
             tree1.codigo3d.push("t1=-1;");
          tree1.codigo3d.push("guardarString();");
-        // tree1.codigo3d.push("//******************************************************************************"); //realizamos la accion
-         //ahora hay que sumarlos :v
-         // valor_imprimir=valor_imprimir+element.value;
-
-        }
 
 
-       });
+          }});
        valor_imprimir="";
        texto="";
   // se agregara al texto se debera pushear los errores del tree temporal
@@ -144,7 +160,7 @@ export class StringEspecial extends Node{
   }
 }
 }
-
+if(this.valorString!==null){
 let contador=tree1.getContador();
 tree1.codigo3d.push("t"+contador+"=p;"); // guardara el inicio de la cadena
 tree1.codigo3d.push("t0="+this.valorString+";");  //cargamos lavieja cadena
@@ -157,11 +173,29 @@ tree1.codigo3d.push("t0=p;");
 tree1.codigo3d.push("t1=-1;");
 tree1.codigo3d.push("guardarString();");
 
+this.type=new Type(types.STRING);
 
+return "t"+contador;
+}
+else
+{
 
+let val=new Primitive(new Type(types.STRING),valor_imprimir,this.line,this.column).codigo3direcciones(table,tree1);
+let contador=tree1.getContador();
+tree1.codigo3d.push("t"+contador+"=p;"); // guardara el inicio de la cadena
+tree1.codigo3d.push("t0="+val+";");  //cargamos lavieja cadena
+tree1.codigo3d.push("concatenarString();"); //realizamos la accion
+tree1.codigo3d.push("t0=p;");
+tree1.codigo3d.push("t1=-1;");
+tree1.codigo3d.push("guardarString();");
   this.type=new Type(types.STRING);
+  return "t"+contador;
 
-        return "t"+contador;
+}
+
+
+
+
       }
 
 

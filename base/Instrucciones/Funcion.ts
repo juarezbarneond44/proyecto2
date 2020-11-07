@@ -79,18 +79,14 @@ Simbolo.FuncionListaId=listaIDDeclaraciones;
 let resultadoFinal=null;
 if(this.ListaInstrucciones!==null){
   for (let x = 0; x < this.ListaInstrucciones.length; x++) {
+    tree.etiquetaReturn=new Array<string>();;
     let element = this.ListaInstrucciones[x];
 
     let val=element.codigo3direcciones(tablaInstrucciones,tree);
 
     if(val instanceof Return)
     {
-      tree.etiquetaReturn=new Array<string>();;
-     // console.log("entra en el return funcion")
       resultadoFinal=val.temporal
-     // tree.codigo3d.push(`goto L${etiquetaS};`);
-     // continue;
-      //aqui es lo pisado :c
     }
     if(val instanceof Break)
     {

@@ -1,3 +1,4 @@
+import { ValorArreglo } from './../Expresiones/ValorArreglo';
 
 import { ArregloValor } from './../Expresiones/ArregloValor';
 
@@ -36,8 +37,18 @@ export class Asignacion extends Node {
         return "error"
       }
     }
+
+    if(resultado.type.type===types.ARRAY)
+    {
+      let tipo=new Type(resultado.type.typeArray);
+      let val=new ValorArreglo(tipo,resultado.DemencionesArray,this.exprecion,this.listaARRAY,this.line,this.column).codigo3direcciones(tabla,tree);
+      tree.codigo3d.push("// asignacion de un arreglo")
+      tree.codigo3d.push(resultado.value+"="+val+";");
+      return null;
+    }
+
     let valor =this.exprecion.codigo3direcciones(tabla,tree);
-    if(resultado.type.type==types.ANY)
+     if(resultado.type.type==types.ANY)
     {
       resultado.type=this.exprecion.type;
       tree.codigo3d.push(`//asignacion`);

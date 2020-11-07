@@ -4,6 +4,8 @@ import { Tree } from "../Simbols/Tree";
 import { Simbol } from "../Simbols/Simbol";
 import { Exceptionn } from "../utilidad/Exceptionn";
 import { ɵConsole } from '@angular/core';
+import {Type} from "../utilidad/Type";
+import {types} from "../utilidad/Type";
 
 /**
  * @class Nodo expresion identificador que obtendra el valor de una variable
@@ -22,6 +24,13 @@ export class Identificador extends Node {
                   tree.excepciones.push(error);
 
                   return error;
+              }
+
+              if(variable.type.type==types.ARRAY)
+              {
+                this.type = variable.type;
+                this.SimboloArreglo=variable;
+                return variable.value;
               }
              let contador=tree.getContador();
               tree.codigo3d.push(`t${contador}=stack[(int)${variable.value}];`);
@@ -56,6 +65,7 @@ export class Identificador extends Node {
 
     return this.identifier;
     }
+    SimboloArreglo:Simbol
     identifier: String;
     /**
      * @constructor Retorna el objeto identificador creado

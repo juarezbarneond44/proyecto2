@@ -1,3 +1,6 @@
+import { Identificador } from './../Expresiones/Identificador';
+import { Type } from './../utilidad/Type';
+import { nuevoArreglo } from './../Expresiones/nuevoArreglo';
 import { DeclararArray } from './DeclararArray';
 
 import { ArregloValor } from './../Expresiones/ArregloValor';
@@ -7,12 +10,101 @@ import {Tabla} from "../Simbols/Tabla";
 import {Tree} from "../Simbols/Tree";
 
 import {types} from "../utilidad/Type";
+import { ValorArreglo } from '../Expresiones/ValorArreglo';
 
 
 export class ArrayInstruccion extends Node{
-  codigo3direcciones(Tabla: Tabla, tree: Tree) {
-    throw new Error('Method not implemented.');
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+
+    let resultado=tabla.getVariable(this.iden);
+    if(resultado===null){
+      //error no se encontro
+      let error =new Exceptionn('Semantico', `el id ${this.iden}  no existe`,this.line, this.column);
+      tree.excepciones.push(error);
+      return null;
+    }
+    if(resultado.type.type!==types.ARRAY){
+ // error el id no es arreglo
+ let error =new Exceptionn('Semantico', `el id ${this.iden}  no es un arreglo`,this.line, this.column);
+ tree.excepciones.push(error);
+ return null;
+}
+
+
+let posisionTemporal="t"+tree.getContador();
+tree.codigo3d.push(posisionTemporal+"="+resultado.value+";");
+for (let x = 0; x < this.listaArrays.length; x++) {
+  const element = this.listaArrays[x];
+if(element instanceof Node){
+let numero=element.codigo3direcciones(tabla,tree);
+tree.codigo3d.push("//***obtener la posicion del arreglo****")
+tree.codigo3d.push("t2="+numero+";");
+tree.codigo3d.push("t0="+posisionTemporal+";");
+tree.codigo3d.push("ObtenerPosArreglo();");
+tree.codigo3d.push(posisionTemporal+"=t0;");
+if(1+x!=this.listaArrays.length)
+{tree.codigo3d.push( `${posisionTemporal}=heap[(int)${posisionTemporal}];`);}
+ }}
+
+if(this.listaExpreciones!==null)
+{
+
+  if(resultado.DemencionesArray<=this.listaArrays.length)
+  {
+    let error =new Exceptionn('Semantico', `el acceso del arreglo no es valido`,this.line, this.column);
+    tree.excepciones.push(error);
+    return null;
   }
+  // aqui se agregara al heap el valor del arreglo
+  tree.codigo3d.push("//*** agregar el valor al arreglo****");
+  let tipo=new Type(resultado.type.typeArray);
+  let val=new ValorArreglo(tipo,resultado.DemencionesArray-this.listaArrays.length,null,this.listaExpreciones,this.line,this.column) .codigo3direcciones(tabla,tree);
+  tree.codigo3d.push(`heap[(int)${posisionTemporal}]=${val};`);
+  return null;
+}else
+{
+  if(this.expresion instanceof nuevoArreglo){
+    tree.codigo3d.push("//*** agregar el valor al arreglo****");
+    let tipo=new Type(resultado.type.typeArray);
+    let val=new ValorArreglo(tipo,resultado.DemencionesArray-this.listaArrays.length,null,this.listaExpreciones,this.line,this.column) .codigo3direcciones(tabla,tree);
+    tree.codigo3d.push(`heap[(int)${posisionTemporal}]=${val};`);return null;
+
+  }else if(this.expresion instanceof Identificador)
+  {
+    if(this.listaArrays.length==resultado.DemencionesArray)
+    {
+      tree.codigo3d.push("//*** agregar el valor al arreglo****");
+      let val=this.expresion.codigo3direcciones(tabla,tree);
+      tree.codigo3d.push(`heap[(int)${posisionTemporal}]=${val};`);
+      return null
+    }
+
+
+
+    tree.codigo3d.push("//*** agregar el valor al arreglo****");
+    let tipo=new Type(resultado.type.typeArray);
+    let val=new ValorArreglo(tipo,resultado.DemencionesArray-this.listaArrays.length,this.expresion,null,this.line,this.column) .codigo3direcciones(tabla,tree);
+    tree.codigo3d.push(`heap[(int)${posisionTemporal}]=${val};`);
+    return null;
+  }
+
+
+}
+if(this.listaArrays.length==resultado.DemencionesArray)
+{
+  tree.codigo3d.push("//*** agregar el valor al arreglo****");
+  let val=this.expresion.codigo3direcciones(tabla,tree);
+  tree.codigo3d.push(`heap[(int)${posisionTemporal}]=${val};`);
+  return null
+}else{
+
+  //error
+  let error =new Exceptionn('Semantico', `el valor en la posicion deseada no es valida`,this.line, this.column);
+  tree.excepciones.push(error);
+  return null;
+}
+
+}
   Traducir(tabla: Tabla, tree: Tree) {
 
 

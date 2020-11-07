@@ -43,6 +43,8 @@ const {StringCharAt} = require('../Expresiones/StringCharAt');
 const {StringToLowerCase} = require('../Expresiones/StringToLowerCase');
 const {StringToUpperCase} = require('../Expresiones/StringToUpperCase');
 const {StringConcat} = require('../Expresiones/StringConcat');
+const {DeclararArreglo} = require('../Instrucciones/DeclararArreglo');
+const {nuevoArreglo} = require('../Expresiones/nuevoArreglo');
 
 var pilaFuncion=new Array();
 var pilaError=new Array();
@@ -51,7 +53,7 @@ var token_error;
 
 %}
 %lex
-%options case-sensitive
+%options case-insensitive
 entero [0-9]+
 decimal {entero}("."{entero})?
 stringliteral ((\"[^"]*\") |(\'[^']*\'))
@@ -118,8 +120,8 @@ sringSpecial ((\`[^`]*\`) )
 "for"                return 'for'
 
 
-
-"for"                return 'for'
+"new"                return 'new'
+"array"                return 'array'
 "in"                return 'in'
 "of"              return 'of'
 "let"               return 'let'
@@ -221,24 +223,25 @@ INSTRUCCION : PRINT  ';' {$$ = $1;}
             | LISTADEIDS '=' EXPRESION ';'  {$$ = new ListaIdentificado(false,$1,$3,@1.first_line,  @1.first_column);}
             |GRAFICARENTORNO {$$=$1;}
             |AsignarArreglo ';'{$$=$1}
-            |ArregloPUSH ';'{$$=$1}
-            |ArregloPOP ';'{$$=$1}
+            |DECLARARARREGLO ';'{$$=$1}
+
 
            //|  ERROR {}
             ;
 
-ArregloPUSH: identifier ARRAYBUSCAR '.' 'push' '(' EXPRESION')'{$$=new ArraPush($1,$2,$6,@1.first_line,  @1.first_column)}
-            |identifier '.' 'push' '(' EXPRESION')'  {$$=new ArraPush($1,null,$5,@1.first_line,  @1.first_column)}
-;
-ArregloPOP: identifier ARRAYBUSCAR '.' 'pop' '(' ')'{$$=new ArrayPop($1,$2,@1.first_line,  @1.first_column)}
-            |identifier '.' 'pop' '(' ')'  {$$=new ArrayPop($1,null,@1.first_line,  @1.first_column)}
-;
+
 
 GRAFICARENTORNO:'graficar_ts' '(' ')'';' {$$=new GraficarEntorno(@1.first_line,  @1.first_column);};
 
 
+DECLARARARREGLO: TIPOINICIAL  'identifier' ':' TIPO  LISTAARRAYS {$$=new DeclararArreglo($1,$2,$4,$5,null,null,@1.first_line,  @1.first_column);}
+| TIPOINICIAL  'identifier' ':' TIPO LISTAARRAYS '='EXPRESION  {$$=new DeclararArreglo($1,$2,$4,$5,$7,null,@1.first_line,  @1.first_column);}
+|TIPOINICIAL  'identifier' ':' TIPO LISTAARRAYS '='ARRAYLISTA1  {$$=new DeclararArreglo($1,$2,$4,$5,null,$7,@1.first_line,  @1.first_column);}
+;
+
 AsignarArreglo: 'identifier' ARRAYBUSCAR '=' ARRAYLISTA1 {$$=new ArrayInstruccion($1,$2,$4,null,@1.first_line,  @1.first_column);}
-               |'identifier' ARRAYBUSCAR '=' EXPRESION   {$$=new ArrayInstruccion($1,$2,null,$4,@1.first_line,  @1.first_column);}
+              |'identifier' ARRAYBUSCAR '=' EXPRESION   {$$=new ArrayInstruccion($1,$2,null,$4,@1.first_line,  @1.first_column);}
+
 ;
 
 
@@ -360,12 +363,7 @@ DECLARACION:  identifier '=' EXPRESION  {$$= new Declaracion(1,false,$1,null,$3 
             |  identifier ':' TIPO {$$= new Declaracion(4,false,$1,$3,null,@1.first_line, @1.first_column);}
             | identifier ':'identifier  '=' EXPRESION {var dec=new Declaracion(5,false,$1,null,$5,@1.first_line, @1.first_column);dec.Identificador=$3;  $$=dec;}
             | identifier ':'identifier    {var dec=new Declaracion(6,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3;  $$=dec;}
-            | identifier ':'TIPO LISTAARRAYS'=' ARRAYLISTA1   {var dec=new Declaracion(7,false,$1,$3,$6,@1.first_line, @1.first_column); dec.valorArreglo=$6; dec.Arrays=$4;  $$=dec;}
-             | identifier ':'TIPO LISTAARRAYS'=' EXPRESION   {var dec=new Declaracion(11,false,$1,$3,$6,@1.first_line, @1.first_column);  dec.Arrays=$4;  $$=dec;}
-            | identifier ':'TIPO LISTAARRAYS   {var dec=new Declaracion(8,false,$1,$3,null,@1.first_line, @1.first_column);  dec.Arrays=$4;  $$=dec;}
-            | identifier ':'identifier  LISTAARRAYS '='ARRAYLISTA1  {var dec=new Declaracion(9,false,$1,null,$6,@1.first_line, @1.first_column); dec.valorArreglo=$6; dec.Identificador=$3; dec.Arrays=$4; $$=dec;}
-             | identifier ':'identifier  LISTAARRAYS '='EXPRESION  {var dec=new Declaracion(12,false,$1,null,$6,@1.first_line, @1.first_column);  dec.Identificador=$3; dec.Arrays=$4; $$=dec;}
-            | identifier ':'identifier  LISTAARRAYS   {var dec=new Declaracion(10,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3; dec.Arrays=$4; $$=dec;}
+
             ;
 
 LISTAARRAYS: LISTAARRAYS ARRAY {$$=$1+1;}
@@ -468,21 +466,22 @@ EXPRESION :'-'EXPRESION %prec UMENOS	    { $$ = new Arithmetic($2, null, '-', @1
           |FUNCIONEJECUTAR {$$=$1;}
           |STRINGESPECIAL { $1= $1.replace(/\`/g,"") ;$$ = new StringEspecial(new Type(types.STRING),$1, @1.first_line, @1.first_column);}
           | LISTADEIDS  {$$ = new ListaIdentificado(true,$1,null,@1.first_line,  @1.first_column);}
-          | identifier ARRAYBUSCAR  {$$ = new ArrayBusqueda($1,$2,@1.first_line,  @1.first_column);}
+          //| identifier ARRAYBUSCAR  {$$ = new ArrayBusqueda($1,$2,@1.first_line,  @1.first_column);}
          // | identifier ARRAYBUSCAR '.' 'length'  {$$ = new ArrayLength($1,$2,@1.first_line,  @1.first_column);}
-          //| identifier  '.length'  {$$ = new ArrayLength($1,null,@1.first_line,  @1.first_column);}
-          |  ArregloPOP {$$=$1}
+          //| 'identifier'  '.length'   {$$ = new ArrayLength($1,null,@1.first_line,  @1.first_column);}
+         // |  ArregloPOP {$$=$1}
           |  EXPRESION '.length' 	 {$$ = new StringLength($1,@1.first_line,  @1.first_column);}
           |  EXPRESION '.charAt'  '('EXPRESION')'	 {$$ = new StringCharAt($1,$4,@1.first_line,  @1.first_column);}
           |  EXPRESION '.toLowerCase' '('')'	 {$$ = new StringToLowerCase($1,@1.first_line,  @1.first_column);}
           |  EXPRESION '.toUpperCase' '('')'	 {$$ = new StringToUpperCase($1,@1.first_line,  @1.first_column);}
           |  EXPRESION '.concat' '('EXPRESION')'	 {$$ = new StringConcat($1,$4,@1.first_line,  @1.first_column);}
-
-         ;
+          | 'new' 'array' '(' EXPRESION ')'  {$$=new nuevoArreglo($4,@1.first_line,  @1.first_column);}
+          ;
 
 
 ARRAYBUSCAR: ARRAYBUSCAR '['EXPRESION']' {$$=$1;$$.push($3);}
  |'['EXPRESION']'{$$=[$2]}
+
 
 ;
 
