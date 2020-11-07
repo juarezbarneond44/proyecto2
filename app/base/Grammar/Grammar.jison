@@ -222,7 +222,7 @@ INSTRUCCION : PRINT  ';' {$$ = $1;}
             | DECLARARTYPE ';'{$$=$1;}
             | LISTADEIDS '=' EXPRESION ';'  {$$ = new ListaIdentificado(false,$1,$3,@1.first_line,  @1.first_column);}
             |GRAFICARENTORNO {$$=$1;}
-            //|AsignarArreglo ';'{$$=$1}
+            |AsignarArreglo ';'{$$=$1}
             |DECLARARARREGLO ';'{$$=$1}
 
 
@@ -240,7 +240,8 @@ DECLARARARREGLO: TIPOINICIAL  'identifier' ':' TIPO  LISTAARRAYS {$$=new Declara
 ;
 
 AsignarArreglo: 'identifier' ARRAYBUSCAR '=' ARRAYLISTA1 {$$=new ArrayInstruccion($1,$2,$4,null,@1.first_line,  @1.first_column);}
-               |'identifier' ARRAYBUSCAR '=' EXPRESION   {$$=new ArrayInstruccion($1,$2,null,$4,@1.first_line,  @1.first_column);}
+              |'identifier' ARRAYBUSCAR '=' EXPRESION   {$$=new ArrayInstruccion($1,$2,null,$4,@1.first_line,  @1.first_column);}
+
 ;
 
 
@@ -427,7 +428,7 @@ LISTAEXPRECIONES: LISTAEXPRECIONES ','EXPRESION    { $$ = $1; $$.push($3);}
 LISTADEIDS: identifier '.' LISTADEIDS2  {$$ = $3; $$.unshift(new IDArray($1,null,@1.first_line, @1.first_column));}
 //| identifier listaarrays '.' LISTADEIDS2  {$$ = $3; $$.unshift(new IDArray($1,$2,@1.first_line, @1.first_column));}
 ;
-LISTADEIDS2:LISTADEIDS2 '.' IDARRAY {$$ = $1; $$.push($3);}
+LISTADEIDS2: LISTADEIDS2 '.' IDARRAY {$$ = $1; $$.push($3);}
             |IDARRAY {$$=[$1];}
 ;
 IDARRAY: identifier   {$$=new IDArray($1,null,@1.first_line, @1.first_column);}
@@ -465,10 +466,7 @@ EXPRESION :'-'EXPRESION %prec UMENOS	    { $$ = new Arithmetic($2, null, '-', @1
           |FUNCIONEJECUTAR {$$=$1;}
           |STRINGESPECIAL { $1= $1.replace(/\`/g,"") ;$$ = new StringEspecial(new Type(types.STRING),$1, @1.first_line, @1.first_column);}
           | LISTADEIDS  {$$ = new ListaIdentificado(true,$1,null,@1.first_line,  @1.first_column);}
-          //| identifier ARRAYBUSCAR  {$$ = new ArrayBusqueda($1,$2,@1.first_line,  @1.first_column);}
-         // | identifier ARRAYBUSCAR '.' 'length'  {$$ = new ArrayLength($1,$2,@1.first_line,  @1.first_column);}
-          //| identifier  '.length'  {$$ = new ArrayLength($1,null,@1.first_line,  @1.first_column);}
-         // |  ArregloPOP {$$=$1}
+          | 'identifier'  ARRAYBUSCAR {$$ = new ArrayBusqueda($1,$2,@1.first_line,  @1.first_column);}
           |  EXPRESION '.length' 	 {$$ = new StringLength($1,@1.first_line,  @1.first_column);}
           |  EXPRESION '.charAt'  '('EXPRESION')'	 {$$ = new StringCharAt($1,$4,@1.first_line,  @1.first_column);}
           |  EXPRESION '.toLowerCase' '('')'	 {$$ = new StringToLowerCase($1,@1.first_line,  @1.first_column);}
@@ -478,8 +476,11 @@ EXPRESION :'-'EXPRESION %prec UMENOS	    { $$ = new Arithmetic($2, null, '-', @1
           ;
 
 
+
+
 ARRAYBUSCAR: ARRAYBUSCAR '['EXPRESION']' {$$=$1;$$.push($3);}
  |'['EXPRESION']'{$$=[$2]}
+
 
 ;
 

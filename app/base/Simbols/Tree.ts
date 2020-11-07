@@ -322,6 +322,7 @@ export class Tree {
  this.Encabezadocodigo3d.push("t0=t0+1;");
  this.Encabezadocodigo3d.push("t1=heap[(int)t0];");
  this.Encabezadocodigo3d.push("if(t1==-1)goto L20;");
+ this.Encabezadocodigo3d.push("if(t1==-2)goto L1;");
  this.Encabezadocodigo3d.push("t2=t0;");
  this.Encabezadocodigo3d.push("t0=heap[(int)t0];");
  this.Encabezadocodigo3d.push("imprimirString();");
@@ -332,6 +333,7 @@ export class Tree {
  this.Encabezadocodigo3d.push("t0=t0+1;");
  this.Encabezadocodigo3d.push("t1=heap[(int)t0];");
  this.Encabezadocodigo3d.push("if(t1==-1)goto L20;");
+ this.Encabezadocodigo3d.push("if(t1==-2)goto L2;");
  this.Encabezadocodigo3d.push("t8=t0;");
  this.Encabezadocodigo3d.push("t0=heap[(int)t0];");// usar t7
  this.Encabezadocodigo3d.push("t7=p;");
@@ -349,6 +351,7 @@ export class Tree {
  this.Encabezadocodigo3d.push("t0=t0+1;");
  this.Encabezadocodigo3d.push("t1=heap[(int)t0];");
  this.Encabezadocodigo3d.push("if(t1==-1)goto L20;");
+ this.Encabezadocodigo3d.push("if(t1==-2)goto L3;");
  this.Encabezadocodigo3d.push("t8=t0;");
  this.Encabezadocodigo3d.push("t0=heap[(int)t0];");// usar t7
  this.Encabezadocodigo3d.push("t7=p;");
@@ -387,7 +390,21 @@ export class Tree {
  this.Encabezadocodigo3d.push("printf(\"%c\",10);");
  this.Encabezadocodigo3d.push("return;");
  this.Encabezadocodigo3d.push("}");
-
+// obtener la pocicion en el arreglo
+this.Encabezadocodigo3d.push("void ObtenerPosArreglo(){");
+this.Encabezadocodigo3d.push("if(t0==-1)goto L20;");
+this.Encabezadocodigo3d.push("if(t0==-2)goto L20;");
+this.Encabezadocodigo3d.push("t0=t0+1;");
+this.Encabezadocodigo3d.push("t1=heap[(int)t0];");
+this.Encabezadocodigo3d.push("if(t1<=t2)goto L20;");
+this.Encabezadocodigo3d.push("t5=2+t2;");
+this.Encabezadocodigo3d.push("t0=t0+t5;");
+this.Encabezadocodigo3d.push("goto L10;");
+this.Encabezadocodigo3d.push("L20:");
+this.Encabezadocodigo3d.push("t0=-1;");
+this.Encabezadocodigo3d.push("L10:");
+this.Encabezadocodigo3d.push("return;");
+this.Encabezadocodigo3d.push("}");
 
 
 

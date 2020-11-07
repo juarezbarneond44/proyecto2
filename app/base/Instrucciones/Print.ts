@@ -1,3 +1,4 @@
+import { Identificador } from './../Expresiones/Identificador';
 import { Arithmetic } from './../Expresiones/Arithmetic';
 import { Primitive } from './../Expresiones/Primitive';
 import { DeclararArray } from './DeclararArray';
@@ -113,7 +114,7 @@ export class Print extends Node{
        tree.codigo3d.push("printf(\"%c\",10);");
        }else if(this.expression[0].type.type==types.ARRAY)
        {
-         console.log(this.expression[0])
+       //   console.log(this.expression[0])
         tree.codigo3d.push("t0="+data+";");
         tree.codigo3d.push("PrintArreglo();");
        }

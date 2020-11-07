@@ -1,4 +1,3 @@
-
 import { Node } from "../Abstract/Node";
 import { Tabla } from "../Simbols/Tabla";
 import { Tree } from "../Simbols/Tree";
@@ -30,6 +29,7 @@ export class Identificador extends Node {
               if(variable.type.type==types.ARRAY)
               {
                 this.type = variable.type;
+                this.SimboloArreglo=variable;
                 return variable.value;
               }
              let contador=tree.getContador();
@@ -65,6 +65,7 @@ export class Identificador extends Node {
 
     return this.identifier;
     }
+    SimboloArreglo:Simbol
     identifier: String;
     /**
      * @constructor Retorna el objeto identificador creado

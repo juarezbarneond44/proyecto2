@@ -5,6 +5,7 @@ import { StringCharAt } from './base/Expresiones/StringCharAt';
 import { StringLength } from './base/Expresiones/StringLength';
 
 
+import { DeclararArreglo } from './base/Instrucciones/DeclararArreglo';
 import { DeclararArray } from './base/Instrucciones/DeclararArray';
 import { ArregloValor } from './base/Expresiones/ArregloValor';
 
@@ -20,7 +21,7 @@ import { Primitive } from './base/Expresiones/Primitive';
 import { ArrayBusqueda } from './base/Expresiones/ArrayBusqueda';
 import { Tree } from './base/Simbols/Tree';
 import { Tabla } from './base/Simbols/Tabla';
-import { Component, ɵɵinjectPipeChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
  import{Arithmetic}from "./base/Expresiones/Arithmetic";
  import{ForIn}from "./base/Instrucciones/ForIn";
 import{Identificador}from "./base/Expresiones/Identificador";
@@ -43,6 +44,7 @@ import {Declaracion} from "./base/Instrucciones/Declaracion";
 import {declararLista} from "./base/Instrucciones/declararLista";
 import {GraficarEntorno} from "./base/Instrucciones/GraficarEntorno";
 
+import{nuevoArreglo}from "./base/Expresiones/nuevoArreglo";
 import {ForOF} from "./base/Instrucciones/ForOF";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import{Parentesis}from "./base/Expresiones/Parentesis";
@@ -115,7 +117,7 @@ ejecutarr:boolean=true;
                if(m instanceof Funcion){ const res = m.codigo3direcciones(this.tabla, this.tree);}
       });
 
-      this.tree.codigo3d.push("void main(){");
+      this.tree.codigo3d.push("int main(){");
 
       this.tree.instructions.map((m) => {
         if(!(m instanceof Funcion)){  const res = m.codigo3direcciones(this.tabla, this.tree);}
@@ -149,7 +151,7 @@ ejecutarr:boolean=true;
           this.textoSalida=this.textoSalida+element+'\n'; }
 
     });
-    this.textoSalida=this.textoSalida+"return;\n}";
+    this.textoSalida=this.textoSalida+"return 1;\n}";
       this.listaErroresEjecucion=this.tree.excepciones;
       console.log(this.listaErroresEjecucion);
 

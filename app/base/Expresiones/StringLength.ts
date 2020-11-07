@@ -24,6 +24,23 @@ export class StringLength extends Node{
      return "t"+temp;
 
 
+   }else if(this.expresion.type.type==types.ARRAY)
+   {
+    tree.codigo3d.push("//*****length del arreglo****");
+    let val=tree.getEtiqueta();
+    let vals=tree.getEtiqueta();
+    let etiqueta="t"+tree.getContador();
+    let temporal="t"+tree.getContador();
+    tree.codigo3d.push(`${temporal}=${valor};`)
+    tree.codigo3d.push(`if(${temporal}==-1)goto L${val};`)
+    tree.codigo3d.push(`${temporal}=${temporal}+1;`)
+    tree.codigo3d.push(`${etiqueta}=heap[(int)${temporal}];`)
+    tree.codigo3d.push(`goto L${vals};`)
+    tree.codigo3d.push(`L${val}:`)
+    tree.codigo3d.push(`${etiqueta}=0;`)
+    tree.codigo3d.push(`L${vals}:`)
+    this.type=new Type(types.NUMERIC);
+    return etiqueta
    }
    else{
     const error = new Exceptionn('Semantico',
