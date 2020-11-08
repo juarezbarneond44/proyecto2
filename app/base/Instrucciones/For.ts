@@ -20,6 +20,7 @@ export class For extends Node{
     tree.codigo3d.push("// *****for*****")
     let etiquetaFor=tree.getEtiqueta();
      this.Instruccion.codigo3direcciones(nueva,tree);
+
      tree.codigo3d.push(`L${etiquetaFor}:`)
     let exprecion=this.Exprecion.codigo3direcciones(nueva,tree);
 

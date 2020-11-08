@@ -332,10 +332,6 @@ FOR:   '(' INSTRUCCION  EXPRESION ';'INCREMENTO ')' BLOQUEINIF {$$=new For($2,$3
       |'('  identifier 'of' EXPRESION ')' BLOQUEINIF  {$$=new ForOF(false,null,$2,$4,$6,@1.first_line,  @1.first_column);}
     ;
 
-//FORIN: //'for' '(' EXPRESION    'in' EXPRESION ')' BLOQUEINIF  {$$=new ForIn($3,$5,$7,@1.first_line,  @1.first_column);}
-  //       'for' '('  DECLARACION 'in' EXPRESION ')' BLOQUEINIF  {$$=new ForIn($3,$5,$7,@1.first_line,  @1.first_column);}
-//;
-
 
 DECLARARTYPE:TIPOINICIAL identifier ':'identifier  '=' '{'LISTAIDS'}'{$$=new DeclararType($1,$2,$4,$7,@1.first_line, @1.first_column);}
 

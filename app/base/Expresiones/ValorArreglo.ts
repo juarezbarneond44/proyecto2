@@ -179,6 +179,12 @@ export class ValorArreglo extends Node{
     }
     else if(this.arregloExpreciones!==null)
     {
+      if(this.type.type===types.ANY)
+      {
+        let dato=this.arregloExpreciones[0];
+        let res=dato.codigo3direcciones(tabla,tree);
+        this.type=res.type;
+      }
    let tem=this.agregarDatos(tabla,tree,this.arregloExpreciones,this.cantidadDimenciones);
      return tem;
     }
