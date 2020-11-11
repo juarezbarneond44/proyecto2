@@ -39,7 +39,7 @@ export class IF extends Node {
            let valor=tree.etiquetasS.pop();tree.etiquetasS.push(valor);
           tree.codigo3d.push(`goto ${valor};`);
           datos =res}
-        if(res instanceof Continue){      ;datos= res}
+        if(res instanceof Continue){      ;datos= res ; break;}
         if(res instanceof Return){    datos=res;
           tree.codigo3d.push(`//****SALIDA DEL RETURN****`);
            if(this.returnnn===null){

@@ -1,3 +1,7 @@
+import { DeclararType } from './DeclararType';
+
+import { DeclararArreglo } from './DeclararArreglo';
+import { element } from 'protractor';
 import { Continue } from './Continue';
 import { Break } from './Break';
 import { Return } from './Return';
@@ -17,6 +21,14 @@ import {Type, types} from "../utilidad/Type";
  */
 export class Funcion extends Node{
   codigo3direcciones(table: Tabla, tree: Tree) {
+    let aux1: Array<Node>=new Array();
+    let aux2:Array<Exceptionn>=new Array();
+    let auxTree=new Tree( aux1,aux2);
+    let auxanidadaValores:Array<String>=new Array();
+let esAnidada=false;
+let posAnidada=0;
+    let nuevaTabla=new Tabla(table);
+let tablaInstrucciones=new Tabla(nuevaTabla);
     tree.etiquetaReturn=new Array<string>();;
     let listaIDDeclaraciones=new Array<String>();
     const res2 =table.getVariable(this.id);
@@ -28,15 +40,100 @@ export class Funcion extends Node{
       return null;
     //  tree.console.push(error.toString());
     }
+
+
+
+
+
 let Simbolo1=new Simbol(true,this.TipoFuncion,this.id,null);
+
+
 const res1 =table.setVariable(Simbolo1);
+
+
 if (res1 != null) {
   const error = new Exceptionn('Semantico',
-      "La Funcion "+ this.id+" ya ha sido declarada",
-      this.line, this.column);
+  "La Funcion "+ this.id+" ya ha sido declarada",
+  this.line, this.column);
   tree.excepciones.push(error);
   return "error";
+  }
+  this.ListaInstrucciones.forEach(dato =>
+    {
+    if(dato instanceof Funcion)
+    {
+      esAnidada=true;
+    }
+    });
+
+
+
+let punteroTree=tree.codigo3d.length;
+let valortree=new Array<String>();
+  if(esAnidada){
+if(this.ListaDeclaraciones!=null)
+{
+  this.ListaDeclaraciones.forEach(element => {
+   // console.log(element)
+   let sim:Simbol
+   if(element instanceof DeclararArreglo)
+   {        sim=element.codigo3direcciones(new Tabla(null),tree);
+          listaIDDeclaraciones.unshift(sim.identifier);
+        }
+    else{
+
+      if(element instanceof DeclararType)
+      {
+        listaIDDeclaraciones.unshift(element.identificador);
+      }else
+      {
+        listaIDDeclaraciones.unshift(element.identifier);
+      }
+      sim=element.codigo3direcciones(nuevaTabla,tree);
+    }
+     sim.temporal=tree.getContador();
+     if(element instanceof DeclararType){     tree.codigo3d.push(`${sim.value}=t${sim.temporal};`);}
+     else{     tree.codigo3d.push(`stack[(int)${sim.value}]=t${sim.temporal};`);}
+     //temporal
+     sim.valorInicial=true;
+     const res2 = nuevaTabla.setVariable(sim);
+
+  });
 }
+
+for (let x = punteroTree; x < tree.codigo3d.length; x++) {
+  valortree.push(tree.codigo3d[x]);
+}
+for (let x = punteroTree; x < tree.codigo3d.length; x++) {
+ tree.codigo3d.pop();
+}
+
+
+this.ListaInstrucciones.forEach(dato =>
+  {
+  if(dato instanceof Funcion)
+  {
+
+    for (let x = punteroTree; x < tree.codigo3d.length; x++)  // se limpia el tree de las declarciones que se hicieron al principio
+    {
+      tree.codigo3d.pop();
+     }
+
+
+    tree.codigo3d.forEach(dat => {
+
+      console.log(dat)
+    });
+   let res=dato.codigo3direcciones(tablaInstrucciones,tree);
+
+  }
+  });
+
+
+
+}
+
+
 
 
 
@@ -48,31 +145,77 @@ if (res1 != null) {
     tree.codigo3d.push(`void ${this.id}(){`);
     tree.etiquetasS.push("L"+etiquetaS);
   // hay que pasar las declaraciones aqui
-  let nuevaTabla=new Tabla(table);
-if(this.ListaDeclaraciones!=null)
-{
-  this.ListaDeclaraciones.forEach(element => {
-   // console.log(element)
-   listaIDDeclaraciones.unshift(element.identifier);
-     let sim=element.codigo3direcciones(nuevaTabla,tree);
-     sim.temporal=tree.getContador();
-     tree.codigo3d.push(`stack[(int)${sim.value}]=t${sim.temporal};`);
-     //temporal
-     sim.valorInicial=true;
-     const res2 = nuevaTabla.setVariable(sim);
 
-  });
-}
+  if(!esAnidada){
+    if(this.ListaDeclaraciones!=null)
+    {
+      this.ListaDeclaraciones.forEach(element => {
+       // console.log(element)
+       let sim:Simbol
+       if(element instanceof DeclararArreglo)
+       {        sim=element.codigo3direcciones(new Tabla(null),tree);
+              listaIDDeclaraciones.unshift(sim.identifier);
+            }
+        else{
 
-let tablaInstrucciones=new Tabla(nuevaTabla);
+          if(element instanceof DeclararType)
+          {
+            listaIDDeclaraciones.unshift(element.identificador);
+          }else
+          {
+            listaIDDeclaraciones.unshift(element.identifier);
+          }
+          sim=element.codigo3direcciones(nuevaTabla,tree);
+        }
+         sim.temporal=tree.getContador();
+         if(element instanceof DeclararType){     tree.codigo3d.push(`${sim.value}=t${sim.temporal};`);}
+         else{     tree.codigo3d.push(`stack[(int)${sim.value}]=t${sim.temporal};`);}
+         //temporal
+         sim.valorInicial=true;
+         const res2 = nuevaTabla.setVariable(sim);
+
+      });
+    }
+      }
+      else
+      {
+
+        valortree.forEach(dato=> {
+          tree.codigo3d.push(dato);
+
+        });
+
+      }
+
+
+
+
 let Simbolo=table.getVariable(this.id);
 let vall=tree.getContador();
 tree.codigo3d.push(`t${vall}=s+${tree.getSTACK()};`);
-Simbolo.cantidadLlamadas="t"+tree.getContador();
-tree.punteroReturn=Simbolo.cantidadLlamadas;
-Simbolo.temporalreturn=tree.punteroReturn;
+
+
 Simbolo.entornoFuncion=nuevaTabla;
 Simbolo.FuncionListaId=listaIDDeclaraciones;
+
+if(!esAnidada){
+  Simbolo.cantidadLlamadas="t"+tree.getContador();
+
+  tree.punteroReturn=Simbolo.cantidadLlamadas;
+  Simbolo.temporalreturn=Simbolo.cantidadLlamadas;
+  }else
+  {
+
+    Simbolo.cantidadLlamadas=tree.punteroReturn;
+  Simbolo.temporalreturn=Simbolo.cantidadLlamadas;
+  }
+
+
+
+
+
+
+
 
 
 
@@ -81,8 +224,13 @@ if(this.ListaInstrucciones!==null){
   for (let x = 0; x < this.ListaInstrucciones.length; x++) {
     tree.etiquetaReturn=new Array<string>();;
     let element = this.ListaInstrucciones[x];
+if(element instanceof Funcion)
+{
+  continue;
 
+}else{
     let val=element.codigo3direcciones(tablaInstrucciones,tree);
+
 
     if(val instanceof Return)
     {
@@ -96,7 +244,7 @@ if(this.ListaInstrucciones!==null){
     if(val instanceof Continue){
       const error = new Exceptionn('Semantico',`No se esperaba un continue`,this.line, this.column);tree.excepciones.push(error);
       }
-
+    }
 
 
   }
@@ -120,10 +268,24 @@ Simbolo.FuncionInstrucciones=this.ListaInstrucciones;
     }
     tree.codigo3d.push(`return;`);
     tree.codigo3d.push(`}`);
+if(false)
+{
+let aux:Array<String>=new Array();
+for (let x = 0; x < tree.codigo3d.length; x++)
+{
+  auxTree.codigo3d.push(tree.codigo3d[x]);
+}
+tree.codigo3d=auxTree.codigo3d;
 
-    tree.etiquetas=5;//L
-    tree.contadorP=0;
-    tree.contadorS=0;
+auxTree.excepciones.forEach(dato => {
+
+  tree.excepciones.push(dato);
+  });
+
+}
+    //tree.etiquetas=5;//L
+   // tree.contadorP=0;
+    //tree.contadorS=0;
     return null;
   }
   Traducir(tabla: Tabla, tree: Tree) {

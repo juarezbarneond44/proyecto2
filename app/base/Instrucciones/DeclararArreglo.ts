@@ -55,9 +55,11 @@ export class DeclararArreglo extends Node{
     let simbolo=new Simbol(this.valorInicial,tipo,this.identificador,temporal);
     simbolo.DemencionesArray=this.cantidadDimenciones;
      let val=new ValorArreglo(this.type,this.cantidadDimenciones,this.expresion,this.arregloExpreciones,this.line,this.column).codigo3direcciones(tabla,tree);
-     tree.codigo3d.push(temporal+"="+val+";");
+     tree.codigo3d.push(`//** guardar variable en el stack ***`);
+     tree.codigo3d.push(`${temporal}=s+${tree.getSTACK()};`);
+     tree.codigo3d.push(`stack[(int)${temporal}]=${val};`);
      tabla.setVariable(simbolo);
-     return null;
+     return simbolo;
 
 
   }

@@ -10,7 +10,9 @@ import {Type, types} from "../utilidad/Type";
  */
 export class Primitive extends Node{
     codigo3direcciones(Tabla: Tabla, tree: Tree) {
-
+if(this.type.type==types.NULL){
+  return -1;
+}
       if(this.type.type===types.STRING){
         {
 

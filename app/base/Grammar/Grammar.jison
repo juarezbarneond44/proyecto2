@@ -267,10 +267,13 @@ LISTADECLARACIONESFUNCION1: ',' DECLARACIONFUNCION LISTADECLARACIONESFUNCION1{  
 
 
 DECLARACIONFUNCION:  'identifier' ':' TIPO {$$= new Declaracion(4,false,$1,$3,null,@1.first_line, @1.first_column);}
-                  |  'identifier' ':' identifier {var dec=new Declaracion(6,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3;  $$=dec;}
-                  | identifier ':'TIPO LISTAARRAYS   {var dec=new Declaracion(8,false,$1,$3,null,@1.first_line, @1.first_column);  dec.Arrays=$4;  $$=dec;}
-                  |  'identifier' ':' identifier LISTAARRAYS  {var dec=new Declaracion(10,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3; dec.Arrays=$4; $$=dec;}
+                  |  'identifier' ':' identifier {$$=new DeclararType(true,$1,$3,null,@1.first_line, @1.first_column);}
+                  | identifier ':'TIPO LISTAARRAYS  {$$=new DeclararArreglo(true,$1,$3,$4,null,null,@1.first_line,  @1.first_column);}
+
+
 ;
+
+
 TIPOFUNCION: ':' TIPO {$$=$2;}
            | {$$=new Type(types.ANY);}
            |':' identifier {var data=new Type(types.OBJET);data.nombre=$2; $$=data;}
@@ -347,6 +350,8 @@ ID:identifier ':' EXPRESION {$$=new IdentificadorExprecion($1,$3,@1.first_line, 
 ASIGNACION : identifier '=' EXPRESION {$$ = new Asignacion($1, $3, @1.first_line, @1.first_column);}
             | identifier '=' '{'LISTAIDS '}' {var data= new Asignacion($1, null, @1.first_line, @1.first_column);data.listaTYPES=$4;data.type=new Type(types.TYPE);$$=data;}
             | identifier '=' ARRAYLISTA1 {var data= new Asignacion($1, null, @1.first_line, @1.first_column);data.listaARRAY=$3;data.type=new Type(types.ARRAY);$$=data;}
+            //| identifier '=' '{' LISTADECLARACIONESTYPE '}' {var data= new Asignacion($1, null, @1.first_line, @1.first_column);data.listaTYPES=$4;data.type=new Type(types.TYPE);$$=data;}
+
           ;
 
 LISTADECLARACIONES : LISTADECLARACIONES ',' DECLARACION   { $$ = $1; $$.push($3); }
@@ -358,8 +363,7 @@ DECLARACION:  identifier '=' EXPRESION  {$$= new Declaracion(1,false,$1,null,$3 
             |  identifier ':' TIPO '=' EXPRESION {$$= new Declaracion(3,false,$1,$3,$5 ,@1.first_line, @1.first_column);}
             |  identifier ':' TIPO {$$= new Declaracion(4,false,$1,$3,null,@1.first_line, @1.first_column);}
             | identifier ':'identifier  '=' EXPRESION {var dec=new Declaracion(5,false,$1,null,$5,@1.first_line, @1.first_column);dec.Identificador=$3;  $$=dec;}
-            | identifier ':'identifier    {var dec=new Declaracion(6,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3;  $$=dec;}
-
+            |  'identifier' ':' identifier {$$=new DeclararType(true,$1,$3,null,@1.first_line, @1.first_column);}
             ;
 
 LISTAARRAYS: LISTAARRAYS ARRAY {$$=$1+1;}

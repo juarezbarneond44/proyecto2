@@ -28,10 +28,15 @@ if(this.value!==null)
  return simbol;
 
 }else{
+
+
+
   //console.log(this)
   let contador=tree.getContador();
   let simbol:Simbol;
-  if(this.type==null){   simbol = new Simbol(this.TipoInicial,new Type(types.ANY), this.identifier,`t${contador}`);;}
+  if(this.type==null){
+       simbol = new Simbol(this.TipoInicial,new Type(types.ANY), this.identifier,`t${contador}`);;
+      }
   else{  simbol  = new Simbol(this.TipoInicial,this.type, this.identifier,`t${contador}`);;}
 
   let stack=tree.getSTACK();
@@ -176,7 +181,7 @@ return data;
             const result = this.value.execute(Table, tree);
             if (result.valor === "Exception") {
              const error = new Exceptionn('Semantico',
-             `No se puede declarar un valor Error`,
+             `No se puede declarar un valor Error juan1`,
              this.line, this.column);
              tree.excepciones.push(error);
              return null;
@@ -215,7 +220,7 @@ return data;
           const result1 = this.value.execute(Table, tree);
           if (result1.valor === "Exception") {
             const error = new Exceptionn('Semantico',
-            `No se puede declarar un valor Error`,
+            `No se puede declarar un valor Error juan 2`,
             this.line, this.column);
             tree.excepciones.push(error);
             return null;
@@ -409,7 +414,7 @@ return data;
                   const result3 = this.value.execute(Table, tree);
                   if (result3.valor === "Exception") {
                    const error = new Exceptionn('Semantico',
-                   `No se puede declarar un valor Error`,
+                   `No se puede declarar un valor Error juan3`,
                    this.line, this.column);
                    tree.excepciones.push(error);
                    return null;
@@ -430,7 +435,7 @@ return data;
                   const result31 = this.value.execute(Table, tree);
                   if (result31.valor === "Exception") {
                    const error = new Exceptionn('Semantico',
-                   `No se puede declarar un valor Error`,
+                   `No se puede declarar un valor Error juan4`,
                    this.line, this.column);
                    tree.excepciones.push(error);
                    return null;

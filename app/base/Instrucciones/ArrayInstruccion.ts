@@ -32,7 +32,7 @@ export class ArrayInstruccion extends Node{
 
 
 let posisionTemporal="t"+tree.getContador();
-tree.codigo3d.push(posisionTemporal+"="+resultado.value+";");
+tree.codigo3d.push(posisionTemporal+"=stack[(int)"+resultado.value+"];");
 for (let x = 0; x < this.listaArrays.length; x++) {
   const element = this.listaArrays[x];
 if(element instanceof Node){

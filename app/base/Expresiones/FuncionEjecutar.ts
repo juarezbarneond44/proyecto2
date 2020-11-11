@@ -1,3 +1,5 @@
+import { DeclararArreglo } from './../Instrucciones/DeclararArreglo';
+import { element } from 'protractor';
 import { Primitive } from './Primitive';
 import { Arithmetic } from './Arithmetic';
 import { Identificador } from './Identificador';
@@ -46,7 +48,7 @@ export class FuncionEjecutar extends Node {
         }
   }
   // esto es para el ackerman
-
+//console.log(tabla)
   //empieza la llamada de funcion
   tree.codigo3d.push(`//*********llamada de funcion ${this.id}***********`);
   if(tabla.Previous===null)  // si la llamada esta en el main
@@ -73,10 +75,12 @@ export class FuncionEjecutar extends Node {
     const element = this.ListaExpreciones[x];
     const idvariable=res.FuncionListaId[x];
     let dato=res.entornoFuncion.getVariable(idvariable);
-    console.log(dato);
+
+   // console.log(dato);
       if(tabla.Previous!==null)
       {
        let aux=tree.getContador();
+
        tree.codigo3d.push(`//variable ->${dato.identifier}`);
         tree.codigo3d.push(`t${aux}=stack[(int)${dato.value}];`);
         tree.codigo3d.push(`stack[(int)${res.cantidadLlamadas}]=t${aux};`);
@@ -86,7 +90,10 @@ export class FuncionEjecutar extends Node {
       {
         tree.codigo3d.push(`t${dato.temporal}=${element.datojuan};`);
       }else{
+        //console.log(element)
+        if(element instanceof DeclararArreglo){ }
       let valor=element.codigo3direcciones(tabla,tree);
+
       tree.codigo3d.push(`t${dato.temporal}=${valor};`);
       }
 }
@@ -121,7 +128,7 @@ if(res.type.type!==types.VOID)
    tree.codigo3d.push(`//se obtiene el valor del return`);
    if(tabla.Previous===null)
    {
-    tree.codigo3d.push(`${valor}=stack[(int)${res.temporalreturn}];`);
+     tree.codigo3d.push(`${valor}=stack[(int)${res.temporalreturn}];`);
     return valor;
    }
    else{

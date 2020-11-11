@@ -48,7 +48,9 @@ export class ValorArreglo extends Node{
           {
             if(this.expresion.SimboloArreglo.DemencionesArray==this.cantidadDimenciones)
             {
-            return valor
+              let tem="t"+tree.getContador();
+              tree.codigo3d.push(tem+"=stack[(int)"+valor+"];")
+            return tem;
             }else{
               const error = new Exceptionn('Semantico',
               "no tiene las mismas dimenciones del arreglo",this.line, this.column);

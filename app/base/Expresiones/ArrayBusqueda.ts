@@ -30,7 +30,7 @@ return error;
 }
 
 let posisionTemporal="t"+tree.getContador();
-tree.codigo3d.push(posisionTemporal+"="+res.value+";");
+tree.codigo3d.push(posisionTemporal+"=stack[(int)"+res.value+"];");
 for (let x = 0; x < this.value.length; x++) {
   const element = this.value[x];
 let numero=element.codigo3direcciones(tabla,tree);

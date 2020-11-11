@@ -20,13 +20,14 @@ export class ForIn extends Node{
     if(this.estado)
     {
       let nuevoEntorno=new Tabla(tabla);
-    let sim=this.Instruccion.execute(nuevoEntorno,tree);
+    let sim=this.Instruccion.codigo3direcciones(nuevoEntorno,tree);
     nuevoEntorno.setVariable(sim);
     let valorsalida:object=null
     tree.pila.push(new Type (types.CICLO));
     let etiquetaFor=tree.getEtiqueta();
-    let exprecion;
-    exprecion=this.Exprecion.codigo3direcciones(nuevoEntorno,tree);
+    let exprecion="t"+tree.getContador();
+
+   let  datoo=this.Exprecion.codigo3direcciones(nuevoEntorno,tree);
 
     if(this.Exprecion.type.type!==types.ARRAY)
     {
@@ -37,13 +38,15 @@ export class ForIn extends Node{
     }
     tree.codigo3d.push("// *****for in*****")
 
+    //let datoo="t"+tree.getContador();
+    tree.codigo3d.push(`${exprecion}=stack[(int)${datoo}];`)
     let etiquetaF=tree.getEtiqueta();
     tree.etiquetasS.push("L"+etiquetaF);
     tree.codigo3d.push(`if(${exprecion}==-1) goto L${etiquetaF};`);
     let temporalArreglo="t"+tree.getContador();
     let valorArreglo="t"+tree.getContador();
     let contador="t"+tree.getContador();
-    let variable="t"+tree.getContador();
+    let variable=sim.value;
     tree.codigo3d.push(`${temporalArreglo}=1+${exprecion};`);
 
     tree.codigo3d.push(`${valorArreglo}=heap[(int)${temporalArreglo}];`);
@@ -125,7 +128,7 @@ export class ForIn extends Node{
       for (let x = 0; x < this.listaInstrucciones.length; x++) {
         const element = this.listaInstrucciones[x];
         let res=element.codigo3direcciones(entorno,tree);
-        if(res instanceof Break)
+        if(element instanceof Break)
         {
           tree.codigo3d.push(`goto L${etiquetaF};`)
         }

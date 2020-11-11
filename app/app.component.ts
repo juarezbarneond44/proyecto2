@@ -113,6 +113,10 @@ ejecutarr:boolean=true;
 
       this.tabla=new Tabla(null);
       if(this.tree.instructions==null){return;}
+          this.tree.instructions.map((m) => {
+        if(m instanceof TypeDeclaracion){ const res = m.codigo3direcciones(this.tabla, this.tree);}
+});
+
       this.tree.instructions.map((m) => {
                if(m instanceof Funcion){ const res = m.codigo3direcciones(this.tabla, this.tree);}
       });
@@ -120,7 +124,7 @@ ejecutarr:boolean=true;
       this.tree.codigo3d.push("int main(){");
 
       this.tree.instructions.map((m) => {
-        if(!(m instanceof Funcion)){  const res = m.codigo3direcciones(this.tabla, this.tree);}
+        if(!(m instanceof Funcion)&&!(m instanceof TypeDeclaracion)){  const res = m.codigo3direcciones(this.tabla, this.tree);}
        });
 
 
