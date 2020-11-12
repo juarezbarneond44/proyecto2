@@ -20,6 +20,7 @@ export class For extends Node{
     tree.codigo3d.push("// *****for*****")
     let etiquetaFor=tree.getEtiqueta();
      this.Instruccion.codigo3direcciones(nueva,tree);
+
      tree.codigo3d.push(`L${etiquetaFor}:`)
     let exprecion=this.Exprecion.codigo3direcciones(nueva,tree);
 
@@ -37,11 +38,13 @@ if(this.Instrucciones!=null)
   this.Instrucciones.forEach(element =>
     {
     let res=element.codigo3direcciones(nueva2,tree);
-    if(res instanceof Break)
+
+    if(element instanceof Break)
     {
+
       tree.codigo3d.push(`goto L${etiquetaF};`)
     }
-     else if(res instanceof Continue)
+     else if(element instanceof Continue)
     {
       this.Incremento.codigo3direcciones(nueva,tree);
       tree.codigo3d.push(`goto L${etiquetaFor};`)
@@ -54,6 +57,7 @@ if(this.Instrucciones!=null)
     }
   });
 }
+
     // hay que hacer el incremento
     this.Incremento.codigo3direcciones(nueva,tree);
     tree.codigo3d.push(`goto L${etiquetaFor};`)

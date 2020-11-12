@@ -10,6 +10,7 @@ import { Simbol } from "../Simbols/Simbol";
 export class GraficarEntorno extends Node{
   codigo3direcciones(table: Tabla, tree: Tree) {
     let aux=table;
+    console.log(table)
     // recorrer la tabla de simbolos
     while(aux.Previous!=null){
       aux=aux.Previous;

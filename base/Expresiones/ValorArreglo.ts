@@ -48,7 +48,9 @@ export class ValorArreglo extends Node{
           {
             if(this.expresion.SimboloArreglo.DemencionesArray==this.cantidadDimenciones)
             {
-            return valor
+              let tem="t"+tree.getContador();
+              tree.codigo3d.push(tem+"=stack[(int)"+valor+"];")
+            return tem;
             }else{
               const error = new Exceptionn('Semantico',
               "no tiene las mismas dimenciones del arreglo",this.line, this.column);
@@ -179,6 +181,12 @@ export class ValorArreglo extends Node{
     }
     else if(this.arregloExpreciones!==null)
     {
+      if(this.type.type===types.ANY)
+      {
+        let dato=this.arregloExpreciones[0];
+        let res=dato.codigo3direcciones(tabla,tree);
+        this.type=res.type;
+      }
    let tem=this.agregarDatos(tabla,tree,this.arregloExpreciones,this.cantidadDimenciones);
      return tem;
     }

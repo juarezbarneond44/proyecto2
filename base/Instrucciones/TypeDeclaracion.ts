@@ -16,9 +16,11 @@ export class TypeDeclaracion extends Node{
         this.type=new Type(types.OBJET);
         this.type.typeObjeto=types.TYPE; this.type.nombre=this.id; return null;
       }
+      tree.codigo3d.push("//*****DECLARAR TYPE*****");
       for(let x=0;x<this.ListaDeclaraciones.length;x++)
       {
         const res=this.ListaDeclaraciones[x].codigo3direcciones(nuevaTabla,tree);
+        tree.codigo3d.pop()
         if(this.ListaDeclaraciones[x].type.type==types.OBJET )
         {
           if(this.ListaDeclaraciones[x].type.typeObjeto==types.TYPE)

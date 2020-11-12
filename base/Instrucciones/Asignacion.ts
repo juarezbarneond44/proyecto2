@@ -1,3 +1,4 @@
+import { DeclararType } from './DeclararType';
 import { ValorArreglo } from './../Expresiones/ValorArreglo';
 
 import { ArregloValor } from './../Expresiones/ArregloValor';
@@ -43,9 +44,45 @@ export class Asignacion extends Node {
       let tipo=new Type(resultado.type.typeArray);
       let val=new ValorArreglo(tipo,resultado.DemencionesArray,this.exprecion,this.listaARRAY,this.line,this.column).codigo3direcciones(tabla,tree);
       tree.codigo3d.push("// asignacion de un arreglo")
-      tree.codigo3d.push(resultado.value+"="+val+";");
+       tree.codigo3d.push(`stack[(int)${resultado.value}]=${val};`);
       return null;
     }
+
+   else if(resultado.type.type===types.TYPE)
+    {
+
+
+        //let val=new ValorArreglo(tipo,resultado.DemencionesArray,this.exprecion,this.listaARRAY,this.line,this.column).codigo3direcciones(tabla,tree);
+        tree.codigo3d.push("// asignacion de un type")
+      if(this.exprecion===null)
+      {
+
+        let dato=new DeclararType(true,"valortemporalirepetiblenoexistexd",resultado.type.nombre,this.listaTYPES,this.line,this.column).codigo3direcciones(new Tabla(tabla),tree);
+       if(dato==null){const error = new Exceptionn('Semantico',
+       `No se puede asignar un error`,
+       this.line, this.column);
+       tree.excepciones.push(error);
+       return "error";
+      };
+
+
+      tree.codigo3d.push(`${resultado.value}=${dato};`);
+
+
+
+
+    return null
+    }else
+    {
+      let dato=this.exprecion.codigo3direcciones(tabla,tree);
+      tree.codigo3d.push(`${resultado.value}=${dato};`);
+
+    }
+
+     //  tree.codigo3d.push(`stack[(int)${resultado.value}]=${val};`);
+      return null;
+    }
+
 
     let valor =this.exprecion.codigo3direcciones(tabla,tree);
      if(resultado.type.type==types.ANY)

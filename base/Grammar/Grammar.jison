@@ -267,10 +267,13 @@ LISTADECLARACIONESFUNCION1: ',' DECLARACIONFUNCION LISTADECLARACIONESFUNCION1{  
 
 
 DECLARACIONFUNCION:  'identifier' ':' TIPO {$$= new Declaracion(4,false,$1,$3,null,@1.first_line, @1.first_column);}
-                  |  'identifier' ':' identifier {var dec=new Declaracion(6,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3;  $$=dec;}
-                  | identifier ':'TIPO LISTAARRAYS   {var dec=new Declaracion(8,false,$1,$3,null,@1.first_line, @1.first_column);  dec.Arrays=$4;  $$=dec;}
-                  |  'identifier' ':' identifier LISTAARRAYS  {var dec=new Declaracion(10,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3; dec.Arrays=$4; $$=dec;}
+                  |  'identifier' ':' identifier {$$=new DeclararType(true,$1,$3,null,@1.first_line, @1.first_column);}
+                  | identifier ':'TIPO LISTAARRAYS  {$$=new DeclararArreglo(true,$1,$3,$4,null,null,@1.first_line,  @1.first_column);}
+
+
 ;
+
+
 TIPOFUNCION: ':' TIPO {$$=$2;}
            | {$$=new Type(types.ANY);}
            |':' identifier {var data=new Type(types.OBJET);data.nombre=$2; $$=data;}
@@ -332,10 +335,6 @@ FOR:   '(' INSTRUCCION  EXPRESION ';'INCREMENTO ')' BLOQUEINIF {$$=new For($2,$3
       |'('  identifier 'of' EXPRESION ')' BLOQUEINIF  {$$=new ForOF(false,null,$2,$4,$6,@1.first_line,  @1.first_column);}
     ;
 
-//FORIN: //'for' '(' EXPRESION    'in' EXPRESION ')' BLOQUEINIF  {$$=new ForIn($3,$5,$7,@1.first_line,  @1.first_column);}
-  //       'for' '('  DECLARACION 'in' EXPRESION ')' BLOQUEINIF  {$$=new ForIn($3,$5,$7,@1.first_line,  @1.first_column);}
-//;
-
 
 DECLARARTYPE:TIPOINICIAL identifier ':'identifier  '=' '{'LISTAIDS'}'{$$=new DeclararType($1,$2,$4,$7,@1.first_line, @1.first_column);}
 
@@ -351,6 +350,8 @@ ID:identifier ':' EXPRESION {$$=new IdentificadorExprecion($1,$3,@1.first_line, 
 ASIGNACION : identifier '=' EXPRESION {$$ = new Asignacion($1, $3, @1.first_line, @1.first_column);}
             | identifier '=' '{'LISTAIDS '}' {var data= new Asignacion($1, null, @1.first_line, @1.first_column);data.listaTYPES=$4;data.type=new Type(types.TYPE);$$=data;}
             | identifier '=' ARRAYLISTA1 {var data= new Asignacion($1, null, @1.first_line, @1.first_column);data.listaARRAY=$3;data.type=new Type(types.ARRAY);$$=data;}
+            //| identifier '=' '{' LISTADECLARACIONESTYPE '}' {var data= new Asignacion($1, null, @1.first_line, @1.first_column);data.listaTYPES=$4;data.type=new Type(types.TYPE);$$=data;}
+
           ;
 
 LISTADECLARACIONES : LISTADECLARACIONES ',' DECLARACION   { $$ = $1; $$.push($3); }
@@ -362,8 +363,7 @@ DECLARACION:  identifier '=' EXPRESION  {$$= new Declaracion(1,false,$1,null,$3 
             |  identifier ':' TIPO '=' EXPRESION {$$= new Declaracion(3,false,$1,$3,$5 ,@1.first_line, @1.first_column);}
             |  identifier ':' TIPO {$$= new Declaracion(4,false,$1,$3,null,@1.first_line, @1.first_column);}
             | identifier ':'identifier  '=' EXPRESION {var dec=new Declaracion(5,false,$1,null,$5,@1.first_line, @1.first_column);dec.Identificador=$3;  $$=dec;}
-            | identifier ':'identifier    {var dec=new Declaracion(6,false,$1,null,null,@1.first_line, @1.first_column);  dec.Identificador=$3;  $$=dec;}
-
+            |  'identifier' ':' identifier {$$=new DeclararType(true,$1,$3,null,@1.first_line, @1.first_column);}
             ;
 
 LISTAARRAYS: LISTAARRAYS ARRAY {$$=$1+1;}
@@ -428,7 +428,7 @@ LISTAEXPRECIONES: LISTAEXPRECIONES ','EXPRESION    { $$ = $1; $$.push($3);}
 LISTADEIDS: identifier '.' LISTADEIDS2  {$$ = $3; $$.unshift(new IDArray($1,null,@1.first_line, @1.first_column));}
 //| identifier listaarrays '.' LISTADEIDS2  {$$ = $3; $$.unshift(new IDArray($1,$2,@1.first_line, @1.first_column));}
 ;
-LISTADEIDS2:LISTADEIDS2 '.' IDARRAY {$$ = $1; $$.push($3);}
+LISTADEIDS2: LISTADEIDS2 '.' IDARRAY {$$ = $1; $$.push($3);}
             |IDARRAY {$$=[$1];}
 ;
 IDARRAY: identifier   {$$=new IDArray($1,null,@1.first_line, @1.first_column);}
@@ -466,10 +466,7 @@ EXPRESION :'-'EXPRESION %prec UMENOS	    { $$ = new Arithmetic($2, null, '-', @1
           |FUNCIONEJECUTAR {$$=$1;}
           |STRINGESPECIAL { $1= $1.replace(/\`/g,"") ;$$ = new StringEspecial(new Type(types.STRING),$1, @1.first_line, @1.first_column);}
           | LISTADEIDS  {$$ = new ListaIdentificado(true,$1,null,@1.first_line,  @1.first_column);}
-          //| identifier ARRAYBUSCAR  {$$ = new ArrayBusqueda($1,$2,@1.first_line,  @1.first_column);}
-         // | identifier ARRAYBUSCAR '.' 'length'  {$$ = new ArrayLength($1,$2,@1.first_line,  @1.first_column);}
-          //| 'identifier'  '.length'   {$$ = new ArrayLength($1,null,@1.first_line,  @1.first_column);}
-         // |  ArregloPOP {$$=$1}
+          | 'identifier'  ARRAYBUSCAR {$$ = new ArrayBusqueda($1,$2,@1.first_line,  @1.first_column);}
           |  EXPRESION '.length' 	 {$$ = new StringLength($1,@1.first_line,  @1.first_column);}
           |  EXPRESION '.charAt'  '('EXPRESION')'	 {$$ = new StringCharAt($1,$4,@1.first_line,  @1.first_column);}
           |  EXPRESION '.toLowerCase' '('')'	 {$$ = new StringToLowerCase($1,@1.first_line,  @1.first_column);}
@@ -477,6 +474,8 @@ EXPRESION :'-'EXPRESION %prec UMENOS	    { $$ = new Arithmetic($2, null, '-', @1
           |  EXPRESION '.concat' '('EXPRESION')'	 {$$ = new StringConcat($1,$4,@1.first_line,  @1.first_column);}
           | 'new' 'array' '(' EXPRESION ')'  {$$=new nuevoArreglo($4,@1.first_line,  @1.first_column);}
           ;
+
+
 
 
 ARRAYBUSCAR: ARRAYBUSCAR '['EXPRESION']' {$$=$1;$$.push($3);}

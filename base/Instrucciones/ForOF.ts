@@ -1,5 +1,5 @@
+import { ValorArreglo } from './../Expresiones/ValorArreglo';
 import { DeclararArray } from './DeclararArray';
-
 import { Simbol } from './../Simbols/Simbol';
 import { Declaracion } from "../Instrucciones/Declaracion";
 import { Return } from './Return';
@@ -16,8 +16,135 @@ import {types} from "../utilidad/Type";
  * Permite imprimir expresiones en la consola
  */
 export class ForOF extends Node{
-  codigo3direcciones(Tabla: Tabla, tree: Tree) {
-    throw new Error('Method not implemented.');
+  codigo3direcciones(tabla: Tabla, tree: Tree) {
+if(this.estado)
+{
+  let nuevoEntorno=new Tabla(tabla);
+let sim=this.Instruccion.codigo3direcciones(nuevoEntorno,tree);
+nuevoEntorno.setVariable(sim);
+let valorsalida:object=null
+tree.pila.push(new Type (types.CICLO));
+let etiquetaFor=tree.getEtiqueta();
+let exprecion="t"+tree.getContador();
+
+let  datoo=this.Exprecion.codigo3direcciones(nuevoEntorno,tree);
+
+if(this.Exprecion.type.type!==types.ARRAY)
+{
+  this.type=new Type(types.ERROR);
+  let error =new Exceptionn('Semantico', `la expresion no es de tipo arreglo`,this.line, this.column);
+  tree.excepciones.push(error);
+return error;
+}
+tree.codigo3d.push("// *****for of*****")
+
+tree.codigo3d.push(`${exprecion}=stack[(int)${datoo}];`)
+let etiquetaF=tree.getEtiqueta();
+tree.etiquetasS.push("L"+etiquetaF);
+tree.codigo3d.push(`if(${exprecion}==-1) goto L${etiquetaF};`);
+let temporalArreglo="t"+tree.getContador();
+let valorArreglo="t"+tree.getContador();
+let variable=sim.value;
+tree.codigo3d.push(`${temporalArreglo}=3+${exprecion};`);
+tree.codigo3d.push(`L${etiquetaFor}:`);
+
+tree.codigo3d.push(`${valorArreglo}=heap[(int)${temporalArreglo}];`);
+tree.codigo3d.push(`if(${valorArreglo}==-1) goto L${etiquetaF};`);
+tree.codigo3d.push(`stack[(int)${variable}]=${valorArreglo};`);
+sim.type=new Type(this.Exprecion.type.typeArray);
+sim.value=variable;
+
+if(this.listaInstrucciones!==null){
+
+  let entorno=new Tabla(nuevoEntorno);
+  for (let x = 0; x < this.listaInstrucciones.length; x++) {
+    const element = this.listaInstrucciones[x];
+    let res=element.codigo3direcciones(entorno,tree);
+    if(element instanceof Break)
+    {
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+    }
+     else if(res instanceof Continue)
+    {
+      tree.codigo3d.push(`${temporalArreglo}=${temporalArreglo}+1;`);
+      tree.codigo3d.push(`goto L${etiquetaFor};`);
+    }
+    else if(res instanceof Return)
+    {
+      if(valorsalida===null){valorsalida= res;   tree.codigo3d.push(`goto L${etiquetaF};`)}
+    }
+  }
+}
+tree.codigo3d.push(`${temporalArreglo}=${temporalArreglo}+1;`);
+tree.codigo3d.push(`goto L${etiquetaFor};`);
+tree.codigo3d.push(`L${etiquetaF}:`);
+return valorsalida;
+}
+else{
+  let etiquetaFor=tree.getEtiqueta();
+  let nuevoEntorno=new Tabla(tabla);
+let sim=tabla.getVariable(this.identificador);
+if(sim ==null)
+{
+  this.type=new Type(types.ERROR);
+  let error =new Exceptionn('Semantico', `no se encontro la variable`,this.line, this.column);
+  tree.excepciones.push(error);
+return error;
+}
+let exprecion;
+exprecion=this.Exprecion.codigo3direcciones(nuevoEntorno,tree);
+if(this.Exprecion.type.type!==types.ARRAY)
+{
+  this.type=new Type(types.ERROR);
+  let error =new Exceptionn('Semantico', `la expresion no es de tipo arreglo`,this.line, this.column);
+  tree.excepciones.push(error);
+return error;
+}
+tree.pila.push(new Type (types.CICLO));
+let valorsalida:object=null
+tree.codigo3d.push("// *****for of*****")
+let etiquetaF=tree.getEtiqueta();
+tree.etiquetasS.push("L"+etiquetaF);
+tree.codigo3d.push(`if(${exprecion}==-1) goto L${etiquetaF};`);
+let temporalArreglo="t"+tree.getContador();
+let valorArreglo="t"+tree.getContador();
+let variable="t"+tree.getContador();
+tree.codigo3d.push(`${temporalArreglo}=3+${exprecion};`);
+tree.codigo3d.push(`L${etiquetaFor}:`);
+tree.codigo3d.push(`${valorArreglo}=heap[(int)${temporalArreglo}];`);
+tree.codigo3d.push(`if(${valorArreglo}==-1) goto L${etiquetaF};`);
+tree.codigo3d.push(`stack[(int)${variable}]=${valorArreglo};`);
+sim.type=new Type(this.Exprecion.type.typeArray);
+sim.value=variable;
+let entorno=new Tabla(nuevoEntorno);
+if(this.listaInstrucciones!==null){
+
+  let entorno=new Tabla(nuevoEntorno);
+  for (let x = 0; x < this.listaInstrucciones.length; x++) {
+    const element = this.listaInstrucciones[x];
+    let res=element.codigo3direcciones(entorno,tree);
+    if(res instanceof Break)
+    {
+      tree.codigo3d.push(`goto L${etiquetaF};`)
+    }
+     else if(res instanceof Continue)
+    {
+      tree.codigo3d.push(`${temporalArreglo}=${temporalArreglo}+1;`);
+      tree.codigo3d.push(`goto L${etiquetaFor};`);
+    }
+    else if(res instanceof Return)
+    {
+      if(valorsalida===null){valorsalida= res;   tree.codigo3d.push(`goto L${etiquetaF};`)}
+    }
+  }
+}
+tree.codigo3d.push(`${temporalArreglo}=${temporalArreglo}+1;`);
+tree.codigo3d.push(`goto L${etiquetaFor};`);
+tree.codigo3d.push(`L${etiquetaF}:`);
+
+return valorsalida;
+}
+
   }
   Traducir(tabla: Tabla, tree: Tree) {
     let data = 'for(';
@@ -48,14 +175,15 @@ export class ForOF extends Node{
   listaInstrucciones:Array<Node>;
   estado:boolean;
   identificador:string;
-  constructor( estado:boolean, Instruccion:Node,identificador:string,Exprecion:Node, listaInstrucciones:Array<Node>,line:number,columna:number){
+  listaValores:Array<Node>;
+  constructor(estado:boolean, Instruccion:Node,identificador:string,Exprecion:Node, listaInstrucciones:Array<Node>,line:number,columna:number){
     super(null,line,columna);
     this.Instruccion=Instruccion;
     this.Exprecion=Exprecion;
     this.listaInstrucciones=listaInstrucciones;
     this.estado=estado;
     this.identificador=identificador;
-  }
+    }
   execute(tabla: Tabla, tree: Tree) {
 
 if(this.estado){

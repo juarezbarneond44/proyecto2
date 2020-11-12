@@ -52,8 +52,7 @@ export class Switch extends Node{
      let res= element.codigo3direcciones(nueva,tree);
      if (res instanceof Return)
      {
-      //tree.codigo3d.push(`//return del swhit*******************`);
-    //  console.log("holaaaaaaaaaa  "+valorSalida+"  "+res.temporal)
+
        if(valorSalida===""){
          valorSalida=res.temporal;
          valorReturnInicial=res;
@@ -62,7 +61,7 @@ export class Switch extends Node{
 
         }
       else{
-         //tree.codigo3d.push(`${valorSalida}=${res.temporal};`);
+
            let valor=tree.etiquetasS.pop();tree.etiquetasS.push(valor);
            tree.codigo3d.push(`goto ${valor};`);}
 

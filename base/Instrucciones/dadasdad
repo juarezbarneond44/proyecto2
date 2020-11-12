@@ -1,107 +1,41 @@
-import {Node} from "../Abstract/Node";
-import {Tabla} from "../Simbols/Tabla";
-import {Tree} from "../Simbols/Tree";
-import {Type, types} from "../utilidad/Type";
-
-
-/**
- * Crea un nuevo objeto Nodo expresion en base a un valor primitivo,
- * por ejemplo numeros, booleanos o cadenas(suponiendo que la cadena es primitivo)
- */
-export class StringEspecial extends Node{
-    Traducir(Tabla: Tabla, tree: Tree) {
-      if(this.type.type===types.STRING){
-        return "\`"+this.value+"\`";
-      }
-      return this.value;
-    }
-    value: Object;
-
-    /**
-     * @constructor Devuelve un nodo que internamente sera una expresion por tener un tipo
-     * @param type Tipo del valor, puede ser numero, cadena o booleano
-     * @param value Valor primitivo que crear
-     * @param line Fila de donde se creo la sentencia
-     * @param column Columna donde se creo la sentencia
-     */
-    constructor(type:Type, value: Object, line: number, column: number){
-        super(type, line, column);
-        this.value = value;
-    }
-    /**
-     * Devuelve el valor inicial e.g. 4
-     * @param Tabla Tabla de simbolos
-     * @param tree Arbol de instrucciones y excepciones
-     */
-    execute(Tabla: Tabla, tree: Tree) {
-console.log(this.value);
- let data:String=this.value+"";
-let estado=0;
-let valor_imprimir="";
-let numero;
-for (let x = 0; x < data.length; x++) {
-  let caracter=data[x];
-
-
-switch(estado){
-
-case 0:
-  {
-  valor_imprimir=valor_imprimir+caracter;
-  if(caracter==="$"){estado=1;}
-  break;
-  }
-case 1:{
-if(caracter==="{"){estado=2;}
-else{valor_imprimir=valor_imprimir+"$"+caracter;estado=0;}
-  break;
-}
-case 2:{
-if(caracter==="\""){ //cadena
-  estado =20;
-
-} else if (this.tiene_numeros(caracter)){
-  estado=21; x--;
-
-}else
-{
-  estado =22;
-
-}
-  break;
-}
-case 20:
-  {
-    if(caracter==="\""){ //cadena
-      estado =2;}
-      else if (caracter==="}"){estado=0;}
-      else{
-        valor_imprimir=valor_imprimir+caracter;
-      }
-    break;
-  }
-case 21:{
-  if (this.tiene_numeros(caracter)||caracter==="."){
-    numero=numero+caracter;
-  }else if (caracter==="}"){estado=0;valor_imprimir=valor_imprimir+numero;numero="";}
-  else if (caracter===" "){estado=2;valor_imprimir=valor_imprimir+numero;numero="";}
-  break;}
+function getPivot(value : number) : number{
+    return value % 1 == 0 ? value : value - 0.5;
 }
 
+function swap(i : number, j: number, array1 : number[]) : void{
+    const temp = array1[i];
+    array1[i] = array1[j];
+    array1[j] = temp;
 }
 
+function quickSort(low: number, high: number, array1 : number[]) : void{
+    let i = low;
+    let j = high;
+    let pivot = array1[getPivot((low + high) / 2)];
 
-      return this.value;
+    while(i <= j){
+        while(array1[i] < pivot){
+            i++;
+        }
+
+        while(array1[j] > pivot){
+            j--;
+        }
+        if(i <= j){
+            swap(i, j, array1);
+            i++;
+            j--;
+        }
     }
 
+    if(low < j){
+        quickSort(low, j, array1);
+    }
+    if(i < high){
+        quickSort(i, high, array1);
+    }
+}
 
-tiene_numeros(texto){
-  let numeros="0123456789";
-   for(let i=0; i<texto.length; i++){
-      if (numeros.indexOf(texto.charAt(i),0)!=-1){
-         return true;
-      }
-   }
-   return false;
-}
-}
+let array1 : number[] = [8, 48, 69, 12, 25, 98, 71, 33, 129, 5];
+quickSort(0, array1.length - 1, array1);
+console.log('QuickSort: ', array1);

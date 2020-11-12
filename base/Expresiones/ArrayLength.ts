@@ -13,8 +13,54 @@ import {Type, types} from "../utilidad/Type";
  * por ejemplo numeros, booleanos o cadenas(suponiendo que la cadena es primitivo)
  */
 export class ArrayLength extends Node{
-    codigo3direcciones(Tabla: Tabla, tree: Tree) {
-      throw new Error('Method not implemented.');
+    codigo3direcciones(tabla: Tabla, tree: Tree) {
+      const res=tabla.getVariable(this.Identificador);
+      if(res===null){
+        this.type=new Type(types.ERROR);
+        let error =new Exceptionn('Semantico', `no existe el identificador: ${this.Identificador} `,this.line, this.column);
+        tree.excepciones.push(error);
+      return error;
+      }
+
+if(res.DemencionesArray<=this.value.length)
+{
+  this.type=new Type(types.ERROR);
+  let error =new Exceptionn('Semantico', `cantidad de posiciones no valida en el arreglo`,this.line, this.column);
+  tree.excepciones.push(error);
+return error;
+}
+let posisionTemporal="t"+tree.getContador();
+tree.codigo3d.push(posisionTemporal+"="+res.value+";");
+for (let x = 0; x < this.value.length; x++) {
+  const element = this.value[x];
+let numero=element.codigo3direcciones(tabla,tree);
+tree.codigo3d.push("//***obtener la posicion del arreglo****")
+tree.codigo3d.push("t2="+numero+";");
+tree.codigo3d.push("t0="+posisionTemporal+";");
+tree.codigo3d.push("ObtenerPosArreglo();");
+tree.codigo3d.push(posisionTemporal+"=t0;");
+
+tree.codigo3d.push( `${posisionTemporal}=heap[(int)${posisionTemporal}];`);
+
+
+}
+
+
+tree.codigo3d.push("//*****length del arreglo****");
+    let val=tree.getEtiqueta();
+    let vals=tree.getEtiqueta();
+    let etiqueta="t"+tree.getContador();
+    tree.codigo3d.push(`if(${posisionTemporal}==-1)goto L${val};`)
+    tree.codigo3d.push(`${posisionTemporal}=${posisionTemporal}+1;`)
+    tree.codigo3d.push(`${etiqueta}=heap[(int)${posisionTemporal}];`)
+    tree.codigo3d.push(`goto L${vals};`)
+    tree.codigo3d.push(`L${val}:`)
+    tree.codigo3d.push(`${etiqueta}=0;`)
+    tree.codigo3d.push(`L${vals}:`)
+    this.type=new Type(types.NUMERIC);
+    return etiqueta
+
+
     }
     Traducir(tabla: Tabla, tree: Tree) {
       let data="";

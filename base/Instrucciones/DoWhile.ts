@@ -27,7 +27,7 @@ if(this.Instruciones!=null)
 for (let x = 0; x < this.Instruciones.length; x++) {
   let element =this.Instruciones[x];
     let res= element.codigo3direcciones(nueva,tree);
-    if(res instanceof Break)
+    if(element instanceof Break)
     {
       tree.codigo3d.push(`goto L${etiquetaF};`)
     }

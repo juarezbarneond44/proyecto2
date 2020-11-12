@@ -32,6 +32,12 @@ export class Identificador extends Node {
                 this.SimboloArreglo=variable;
                 return variable.value;
               }
+
+              if(variable.type.type==types.TYPE)
+              {
+                this.type = variable.type;
+                return variable.value;
+              }
              let contador=tree.getContador();
               tree.codigo3d.push(`t${contador}=stack[(int)${variable.value}];`);
               this.type = variable.type;

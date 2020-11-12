@@ -1,5 +1,4 @@
 
-
 import { Simbol } from './../Simbols/Simbol';
 import { IdentificadorExprecion } from './IdentificadorExprecion';
 
@@ -10,12 +9,13 @@ import {Tree} from "../Simbols/Tree";
 import {Type} from "../utilidad/Type";
 import {types} from "../utilidad/Type";
 
+
 /**
  * Permite imprimir expresiones en la consola
  */
 export class DeclararType extends Node{
   codigo3direcciones(table: Tabla, tree: Tree) {
-
+    //tree.codigo3d.push("//*****DECLARAR TYPE********");
     const res = table.getVariable(this.tipo); // se busca si existe el tipo
     if (res === null){
       const error = new Exceptionn('Semantico',
@@ -39,6 +39,30 @@ export class DeclararType extends Node{
     }
 // aqui ya es type y existe e ltype
 // tslint:disable-next-line: prefer-for-of
+
+tree.codigo3d.push("//*****declarar variable tipo type****")
+let pocicion=tree.getContador();
+let stack=tree.getSTACK();
+
+if(this.listaAsignaciones===null)
+{
+
+this.type=new Type(types.TYPE)
+this.type.nombre=this.tipo;
+let stack=tree.getSTACK();
+tree.codigo3d.push(`t${pocicion}=-1;`);
+//tree.codigo3d.push(`t${pocicion}=s+${stack};`);
+{
+  let sim=new Simbol(true,this.type,this.identificador,"t"+pocicion);
+
+ return sim;
+
+}
+
+
+
+}
+
 if(this.listaAsignaciones.length!=tablaa.Variables.size){
 const error = new Exceptionn('Semantico',
 "El tamaño de la declaracion del type no es el mismo que el del type original",
@@ -47,8 +71,8 @@ tree.excepciones.push(error);
 return null;
 
 }
-    let nuevaTabla=new Tabla (null);
-    for (let x=0;x<this.listaAsignaciones.length;x++){
+let nuevaTabla=new Tabla (null);
+for (let x=0;x<this.listaAsignaciones.length;x++){
      const dato= tablaa.getVariable(this.listaAsignaciones[x].identificador);
        if(dato==null){     const error = new Exceptionn('Semantico',
       'no exite atributo ' +this.listaAsignaciones[x].identificador+ " dentro del type",
@@ -64,8 +88,14 @@ return null;
     tree.excepciones.push(error);
     return null;
     }
+    // aqui esta la declaracion
      const resultado=this.listaAsignaciones[x].exprecion.codigo3direcciones(table,tree);
 
+      let stack=tree.getSTACK();
+      tree.codigo3d.push(`// declaracion`);
+      let contador=tree.getContador();
+      tree.codigo3d.push(`t${contador}=s+${stack};`);
+tree.codigo3d.push(`stack[(int)t${contador}]=${resultado};`)
    if(resultado instanceof Exceptionn ||resultado.valor==="Exception"){
     const error = new Exceptionn('Semantico',
     'No se puede asignar un valor tipo error',
@@ -75,10 +105,9 @@ return null;
    }
 
      if (this.listaAsignaciones[x].exprecion.type.type===dato.type.type||dato.type.type==types.ANY){
-  // if(this.listaAsignaciones[x].exprecion.type.type==types.OBJET)
-  {
- // tslint:disable-next-line: max-line-length
- const resultado1=nuevaTabla.setVariable(new Simbol(true,this.listaAsignaciones[x].exprecion.type,this.listaAsignaciones[x].identificador,resultado))
+
+{
+ const resultado1=nuevaTabla.setVariable(new Simbol(true,this.listaAsignaciones[x].exprecion.type,this.listaAsignaciones[x].identificador,stack))
 if(resultado1!=null){  const error = new Exceptionn('Semantico',
 resultado1,
 this.line, this.column);
@@ -89,8 +118,8 @@ return null;}
   // tslint:disable-next-line: max-line-length
 
   this.listaAsignaciones[x].exprecion.type.nombre=dato.type.nombre;
-  let  fin=new Type(dato.type.typeObjeto);
-  fin.typeObjeto=types.TYPE;
+  let  fin=new Type(types.TYPE);
+  fin.type=types.TYPE;
   fin.nombre=dato.type.nombre
 
   const resultado1= nuevaTabla.setVariable(new Simbol(true,fin,this.listaAsignaciones[x].identificador,resultado))
@@ -126,10 +155,15 @@ else {
 }
 
 }
-let tipoo=new Type(types.OBJET);
+let tipoo=new Type(types.TYPE);
 tipoo.type=types.TYPE;
 tipoo.nombre=this.tipo;
-const sim=new Simbol(this.tipoInicial,tipoo,this.identificador,nuevaTabla);;
+let sim=new Simbol(this.tipoInicial,tipoo,this.identificador,nuevaTabla);;
+
+ sim.value="t"+pocicion;
+
+
+ tree.codigo3d.push(`t${pocicion}=s+${stack};`);
 const final=table.setVariable(sim);
 if(final!==null){
 const error = new Exceptionn('Semantico',
@@ -139,7 +173,8 @@ tree.excepciones.push(error);
 return null;
 
 }
-return null;
+
+return sim.value;
   }
   Traducir(tabla: Tabla, tree: Tree) {
   //  console.log(this)

@@ -1,3 +1,4 @@
+import { DeclararType } from './DeclararType';
 import { Identificador } from './../Expresiones/Identificador';
 import { Arithmetic } from './../Expresiones/Arithmetic';
 import { Primitive } from './../Expresiones/Primitive';
@@ -18,15 +19,25 @@ import { NULL_EXPR } from '@angular/compiler/src/output/output_ast';
 export class Print extends Node{
   codigo3direcciones(tabla: Tabla, tree: Tree) {
     let data="";
-   // console.log(tabla)
+
     if(this.expression!==null){
 
       if(this.expression.length===1)
       {  tree.codigo3d.push("//***print****")
 
         data=this.expression[0].codigo3direcciones(tabla,tree);
+
         if(this.expression[0].type===null){return null}
-        if(this.expression[0].type.type==types.STRING)
+          if (this.expression[0].type.type==types.TYPE)
+        {
+
+          let etiqueta=tree.getContador();
+
+
+          tree.codigo3d.push("printf(\"%d\",(int)"+data+");");
+          tree.codigo3d.push("printf(\"%c\",10);");
+        }
+        else if(this.expression[0].type.type==types.STRING)
         {
           tree.codigo3d.push("t0="+data+";");
           tree.codigo3d.push("imprimirString();");
@@ -59,6 +70,7 @@ export class Print extends Node{
                 // tree.codigo3d.push("printf(\"%c\",10);");
 
             }
+
             else if (this.expression[0] instanceof Arithmetic)
             {
               tree.codigo3d.push("t0="+data+";");
@@ -114,8 +126,7 @@ export class Print extends Node{
        tree.codigo3d.push("printf(\"%c\",10);");
        }else if(this.expression[0].type.type==types.ARRAY)
        {
-       //   console.log(this.expression[0])
-        tree.codigo3d.push("t0="+data+";");
+        tree.codigo3d.push("t0=stack[(int)"+data+"];");
         tree.codigo3d.push("PrintArreglo();");
        }
 
@@ -127,9 +138,16 @@ export class Print extends Node{
          let val=this.expression[x];
          // if(x-1>-1){data=data+",";}
          let aux=new  Print([val],this.line,this.column).codigo3direcciones(tabla,tree);
-           tree.codigo3d.pop();
-           //tree.codigo3d.push("printf(\"%c\",44);");
-           tree.codigo3d.push("printf(\"%c\",32);");
+
+         if(val.type.type!==types.ARRAY){tree.codigo3d.pop();
+
+          if(x!==0){tree.codigo3d.push("printf(\"%c\",44);");}
+
+
+        }
+
+
+
 
         }
         tree.codigo3d.push("printf(\"%c\",10);");
