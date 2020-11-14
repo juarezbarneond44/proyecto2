@@ -118,12 +118,6 @@ this.ListaInstrucciones.forEach(dato =>
     {
       tree.codigo3d.pop();
      }
-
-
-    tree.codigo3d.forEach(dat => {
-
-      console.log(dat)
-    });
    let res=dato.codigo3direcciones(tablaInstrucciones,tree);
 
   }

@@ -236,21 +236,28 @@ export class Arithmetic extends Node {
     }
     else if(this.Operator==="||")
     {
-      if(this.leftOperator.type.type===types.BOOLEAN&&this.rightOperator.type.type===types.BOOLEAN)
+      if(this.leftOperator.type.type===types.BOOLEAN)
       {
-
-       let valor;
-       tree.codigo3d.push(`//comparar ||`);
-       tree.codigo3d.push(`if(${izquierdo}||${derecho})goto L${tree.getEtiqueta()};`);
-       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
-       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
-       tree.codigo3d.push(`t${tree.getContador()}=1;`);
-       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
-       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
-       tree.codigo3d.push(`t${tree.contador-1}=0;`);
-       tree.codigo3d.push(`L${tree.etiquetas-1}:`);
-       this.type=new Type(types.BOOLEAN);
-        return "t"+(tree.contador-1);
+        let etiquetaV="L"+tree.getEtiqueta();
+        let etiquetaV1="L"+tree.getEtiqueta();
+        let etiquetaF="L"+tree.getEtiqueta();
+        let etiquetaS="L"+tree.getEtiqueta();
+        let temporal="t"+tree.getContador();
+        let valor;
+        tree.codigo3d.push(`//comparar ||`);
+        tree.codigo3d.push(`if(${izquierdo}==1)goto ${etiquetaV1};`);
+        tree.codigo3d.push(`goto ${etiquetaV};`);
+        tree.codigo3d.push(`${etiquetaV}:`);
+        tree.codigo3d.push(`if(${derecho}==1)goto ${etiquetaV1};`);
+        tree.codigo3d.push(`goto ${etiquetaF};`);
+        tree.codigo3d.push(`${etiquetaF}:`);
+        tree.codigo3d.push(`${temporal}=0;`);
+        tree.codigo3d.push(`goto ${etiquetaS};`);
+        tree.codigo3d.push(`${etiquetaV1}:`);
+        tree.codigo3d.push(`${temporal}=1;`);
+        tree.codigo3d.push(`${etiquetaS}:`);
+         this.type=new Type(types.BOOLEAN);
+         return temporal;
       }else
       {
         const error = new Exceptionn('Semantico',
@@ -263,21 +270,28 @@ export class Arithmetic extends Node {
     }
     else if(this.Operator==="&&")
     {
-      if(this.leftOperator.type.type===types.BOOLEAN&&this.rightOperator.type.type===types.BOOLEAN)
+      if(this.leftOperator.type.type===types.BOOLEAN)
       {
-
+       let etiquetaV="L"+tree.getEtiqueta();
+       let etiquetaV1="L"+tree.getEtiqueta();
+       let etiquetaF="L"+tree.getEtiqueta();
+       let etiquetaS="L"+tree.getEtiqueta();
+       let temporal="t"+tree.getContador();
        let valor;
        tree.codigo3d.push(`//comparar &&`);
-       tree.codigo3d.push(`if(${izquierdo}&&${derecho})goto L${tree.getEtiqueta()};`);
-       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
-       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
-       tree.codigo3d.push(`t${tree.getContador()}=1;`);
-       tree.codigo3d.push(`goto L${tree.getEtiqueta()};`);
-       tree.codigo3d.push(`L${tree.etiquetas-2}:`);
-       tree.codigo3d.push(`t${tree.contador-1}=0;`);
-       tree.codigo3d.push(`L${tree.etiquetas-1}:`);
-       this.type=new Type(types.BOOLEAN);
-        return "t"+(tree.contador-1);
+       tree.codigo3d.push(`if(${izquierdo}==1)goto ${etiquetaV};`);
+       tree.codigo3d.push(`goto ${etiquetaF};`);
+       tree.codigo3d.push(`${etiquetaV}:`);
+       tree.codigo3d.push(`if(${derecho}==1)goto ${etiquetaV1};`);
+       tree.codigo3d.push(`goto ${etiquetaF};`);
+       tree.codigo3d.push(`${etiquetaF}:`);
+       tree.codigo3d.push(`${temporal}=0;`);
+       tree.codigo3d.push(`goto ${etiquetaS};`);
+       tree.codigo3d.push(`${etiquetaV1}:`);
+       tree.codigo3d.push(`${temporal}=1;`);
+       tree.codigo3d.push(`${etiquetaS}:`);
+        this.type=new Type(types.BOOLEAN);
+        return temporal;
       }else
       {
         const error = new Exceptionn('Semantico',
@@ -628,6 +642,10 @@ return "error";
   }catch(error){this.type = new Type(types.ERROR);return "error";}
   }
   Traducir(Tabla: Tabla, tree: Tree) {
+
+
+
+
 let izquierdo="";
 let derecho="";
 if(this.leftOperator!==null){izquierdo=this.leftOperator.Traducir(Tabla,tree);}
@@ -639,7 +657,8 @@ else{  let data=  this.Operator+izquierdo;  return data;}
 
 
 
-  }
+
+}
     leftOperator: Node;
     rightOperator: Node;
     Operator: String;

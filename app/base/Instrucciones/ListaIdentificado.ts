@@ -10,7 +10,73 @@ import { Tree } from "../Simbols/Tree";
 export class ListaIdentificado extends Node {
 codigo3direcciones(table: Tabla, tree: Tree)
 {
+  let tablaIDentificador:any=table
   try{
+    //console.log("---el entorno es----")
+   //   console.log(tablaIDentificador)
+     // console.log("---el entorno es----")
+let ultimoID;
+let datoFinal;
+    for (let x = 0; x < this.linstaID.length; x++) {
+      const id = this.linstaID[x].identificador;
+      ultimoID=id;
+      // esto es el string del id
+
+      let tipoID:Simbol=tablaIDentificador.getVariable(id);
+     // console.log("*******"+x+"******")
+    //  console.log(tipoID)
+      if(tipoID.type.type===types.TYPE||tipoID.type.typeObjeto===types.TYPE)
+      {
+      //  console.log("entra para ver su tabla "+tipoID.type.nombre)
+        // se obtiene el simbolo del type
+         datoFinal=table.getVariable(tipoID.type.nombre);
+        // se asigna la nueva tabla de ese nuevo entorno del type
+        tablaIDentificador=datoFinal.value;
+      }
+
+
+     // console.log("---el entorno es----")
+      //console.log(tablaIDentificador)
+     // console.log("---el entorno es----")
+      //console.log(tipoID)
+     // console.log("*******"+x+"******")
+    }
+    //console.log(tablaIDentificador)
+    console.log(datoFinal);
+    if(datoFinal instanceof Simbol)
+    {
+      if(null===tablaIDentificador.getVariable(ultimoID))
+      {
+      console.log("es un type");
+
+      }else
+      {
+        console.log("es un valor");
+      }
+
+    }
+
+
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   let tablaFinal=table;
 
 
@@ -26,6 +92,7 @@ codigo3direcciones(table: Tabla, tree: Tree)
 
     if(obtenerType.value instanceof Tabla){
       let contador=1;
+/*
       obtenerType.value.Variables.forEach(variableDelType => {
         if(variableDelType.identifier===elemento.identificador)
         {
@@ -39,7 +106,9 @@ codigo3direcciones(table: Tabla, tree: Tree)
         contador++;
       });
   }
+  */
   }
+}
     if(valor==null)
     {const error = new Exceptionn('Semantico',
       "no existe el ID",
@@ -47,6 +116,27 @@ codigo3direcciones(table: Tabla, tree: Tree)
    tree.excepciones.push(error);
    return null;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    // existe la variable :v
 if(this.estado) // esto es para obtener un valor
 {
