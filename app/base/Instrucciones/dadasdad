@@ -1,0 +1,41 @@
+function getPivot(value : number) : number{
+    return value % 1 == 0 ? value : value - 0.5;
+}
+
+function swap(i : number, j: number, array1 : number[]) : void{
+    const temp = array1[i];
+    array1[i] = array1[j];
+    array1[j] = temp;
+}
+
+function quickSort(low: number, high: number, array1 : number[]) : void{
+    let i = low;
+    let j = high;
+    let pivot = array1[getPivot((low + high) / 2)];
+
+    while(i <= j){
+        while(array1[i] < pivot){
+            i++;
+        }
+
+        while(array1[j] > pivot){
+            j--;
+        }
+        if(i <= j){
+            swap(i, j, array1);
+            i++;
+            j--;
+        }
+    }
+
+    if(low < j){
+        quickSort(low, j, array1);
+    }
+    if(i < high){
+        quickSort(i, high, array1);
+    }
+}
+
+let array1 : number[] = [8, 48, 69, 12, 25, 98, 71, 33, 129, 5];
+quickSort(0, array1.length - 1, array1);
+console.log('QuickSort: ', array1);
